@@ -1,0 +1,23 @@
+# Deps
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+build/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / Editor
+.vscode/*
+!.vscode/extensions.json
+
