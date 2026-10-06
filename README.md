@@ -2,6 +2,9 @@
 
 > Repositorio **backend** del proyecto final de carrera: un sistema de gestión para la escena musical local, incluyendo bandas, eventos y espectadores/publico general. Este backend expone una API REST para ser consumida por un frontend.
 
+## Diagrama Entidad-Relacion Inicial
+![Diagrama ER](./assets/diagrama-er.png)
+
 ## Integrantes
 
 - Julian Riedinger (GitHub: `@JulianRiedinger7`)
