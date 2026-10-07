@@ -1,11 +1,11 @@
-import "dotenv/config";
+import 'dotenv/config';
 
 export const env = {
   PORT: Number(process.env.PORT ?? 3000),
-  NODE_ENV: process.env.NODE_ENV ?? "development",
-  CORS_ORIGIN: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+  NODE_ENV: process.env.NODE_ENV ?? 'development',
+  CORS_ORIGIN: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
 } as const;
 
 if (Number.isNaN(env.PORT)) {
-  throw new Error("PORT debe ser un número válido");
+  throw new Error('PORT debe ser un número válido');
 }
