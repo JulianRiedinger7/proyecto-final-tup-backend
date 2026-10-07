@@ -3,6 +3,8 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
+import { errorHandler } from './middlewares/errorHandler';
+import { successResponse } from './utils/response';
 
 export class App {
   public readonly instance: express.Express;
@@ -17,28 +19,34 @@ export class App {
     this.instance.use(helmet());
     this.instance.use(
       cors({
-        origin: env.CORS_ORIGIN.split(',').map((o) => o.trim()),
+        origin: env.CORS_ORIGIN,
       }),
     );
     this.instance.use(express.json());
-    this.instance.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+    this.instance.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'development'));
   }
 
   private setupRoutes(): void {
     this.instance.get('/', (_req, res) => {
-      res.json({
-        name: 'proyecto-final-backend',
-        docs: '/api/health',
-      });
+      res.json(
+        successResponse('Ok', 200, {
+          name: 'proyecto-final-backend',
+          docs: '/api/health',
+        }),
+      );
     });
 
     this.instance.get('/api/health', (_req, res) => {
-      res.json({
-        status: 'ok',
-        service: 'proyecto-final-backend',
-        timestamp: new Date().toISOString(),
-      });
+      res.json(
+        successResponse('Ok', 200, {
+          status: 'ok',
+          service: 'proyecto-final-backend',
+          timestamp: new Date().toISOString(),
+        }),
+      );
     });
+
+    this.instance.use(errorHandler);
   }
 
   public listen(port: number, onReady?: () => void): void {
