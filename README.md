@@ -64,7 +64,16 @@ pnpm dev        # desarrollo con recarga (tsx watch src/server.ts)
 pnpm build      # compila TypeScript -> dist/
 pnpm start      # corre lo compilado (node dist/server.js)
 pnpm typecheck  # solo verifica tipos, sin compilar
+pnpm lint       # chequea lint+formato con Biome (todo el repo)
+pnpm lint:fix   # aplica fixes seguros + formato (todo el repo)
+pnpm format:check # chequeo de formato estilo CI (biome ci)
 ```
+
+> Estilo de código: **Biome 2.x** (`biome.json`, comillas dobles, 2 espacios, LF, imports ordenados).
+> El hook `pre-commit` de **Husky** corre `biome check --staged` y bloquea el commit si hay errores.
+> Si el hook te frena, corre `pnpm lint:fix`, revisa el diff y commitea de nuevo.
+> Extensión recomendada VSCode: `biomejs.biome` (ver `.vscode/extensions.json`).
+> Cuando el proyecto crezca y el hook se vuelva lento, el siguiente paso es agregar `lint-staged`.
 
 La API queda en `http://localhost:3000` (o el `PORT` definido en tu `.env`).
 
