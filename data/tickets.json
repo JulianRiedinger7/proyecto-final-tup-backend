@@ -1,0 +1,252 @@
+[
+  {
+    "id": 1,
+    "espectadorId": 1,
+    "eventoId": 1,
+    "codigoQr": "CV-QR-7F8A1B01",
+    "precioUnitario": 4500,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-09-15T18:24:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 2,
+    "espectadorId": 2,
+    "eventoId": 1,
+    "codigoQr": "CV-QR-9D2C3E02",
+    "precioUnitario": 4500,
+    "estado": "UTILIZADO",
+    "createdAt": "2026-09-16T10:12:15.000Z",
+    "fechaValidacionPuerta": "2026-10-02T21:45:10.000Z"
+  },
+  {
+    "id": 3,
+    "espectadorId": 3,
+    "eventoId": 1,
+    "codigoQr": "CV-QR-4A1B2C03",
+    "precioUnitario": 4500,
+    "estado": "CANCELADO",
+    "createdAt": "2026-09-17T14:05:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 4,
+    "espectadorId": 4,
+    "eventoId": 2,
+    "codigoQr": "CV-QR-3C4D5E04",
+    "precioUnitario": 6000,
+    "estado": "RESERVADO",
+    "createdAt": "2026-09-18T09:30:22.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 5,
+    "espectadorId": 5,
+    "eventoId": 2,
+    "codigoQr": "CV-QR-8F9E0A05",
+    "precioUnitario": 6000,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-09-19T11:45:10.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 6,
+    "espectadorId": 6,
+    "eventoId": 2,
+    "codigoQr": "CV-QR-1B2C3D06",
+    "precioUnitario": 6000,
+    "estado": "UTILIZADO",
+    "createdAt": "2026-09-20T16:20:00.000Z",
+    "fechaValidacionPuerta": "2026-10-03T22:10:05.000Z"
+  },
+  {
+    "id": 7,
+    "espectadorId": 7,
+    "eventoId": 3,
+    "codigoQr": "CV-QR-5E6F7A07",
+    "precioUnitario": 5000,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-09-21T13:10:45.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 8,
+    "espectadorId": 8,
+    "eventoId": 3,
+    "codigoQr": "CV-QR-2A3B4C08",
+    "precioUnitario": 5000,
+    "estado": "RESERVADO",
+    "createdAt": "2026-09-22T08:05:30.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 9,
+    "espectadorId": 9,
+    "eventoId": 3,
+    "codigoQr": "CV-QR-7C8D9E09",
+    "precioUnitario": 5000,
+    "estado": "CANCELADO",
+    "createdAt": "2026-09-23T15:40:12.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 10,
+    "espectadorId": 10,
+    "eventoId": 1,
+    "codigoQr": "CV-QR-0F1A2B10",
+    "precioUnitario": 4500,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-09-24T19:00:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 11,
+    "espectadorId": 1,
+    "eventoId": 2,
+    "codigoQr": "CV-QR-6B7C8D11",
+    "precioUnitario": 6000,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-09-25T12:15:33.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 12,
+    "espectadorId": 2,
+    "eventoId": 3,
+    "codigoQr": "CV-QR-3E4F5A12",
+    "precioUnitario": 5000,
+    "estado": "UTILIZADO",
+    "createdAt": "2026-09-26T17:50:20.000Z",
+    "fechaValidacionPuerta": "2026-10-04T21:15:00.000Z"
+  },
+  {
+    "id": 13,
+    "espectadorId": 3,
+    "eventoId": 4,
+    "codigoQr": "CV-QR-9A0B1C13",
+    "precioUnitario": 7500,
+    "estado": "RESERVADO",
+    "createdAt": "2026-09-27T10:05:10.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 14,
+    "espectadorId": 4,
+    "eventoId": 4,
+    "codigoQr": "CV-QR-4D5E6F14",
+    "precioUnitario": 7500,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-09-28T14:22:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 15,
+    "espectadorId": 5,
+    "eventoId": 4,
+    "codigoQr": "CV-QR-8A9B0C15",
+    "precioUnitario": 7500,
+    "estado": "CANCELADO",
+    "createdAt": "2026-09-29T18:30:40.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 16,
+    "espectadorId": 6,
+    "eventoId": 5,
+    "codigoQr": "CV-QR-1D2E3F16",
+    "precioUnitario": 3800,
+    "estado": "RESERVADO",
+    "createdAt": "2026-09-30T11:10:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 17,
+    "espectadorId": 7,
+    "eventoId": 5,
+    "codigoQr": "CV-QR-5A6B7C17",
+    "precioUnitario": 3800,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-10-01T09:45:15.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 18,
+    "espectadorId": 8,
+    "eventoId": 5,
+    "codigoQr": "CV-QR-2D3E4F18",
+    "precioUnitario": 3800,
+    "estado": "UTILIZADO",
+    "createdAt": "2026-10-01T15:20:30.000Z",
+    "fechaValidacionPuerta": "2026-10-05T20:30:12.000Z"
+  },
+  {
+    "id": 19,
+    "espectadorId": 9,
+    "eventoId": 1,
+    "codigoQr": "CV-QR-7A8B9C19",
+    "precioUnitario": 4500,
+    "estado": "RESERVADO",
+    "createdAt": "2026-10-02T13:00:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 20,
+    "espectadorId": 10,
+    "eventoId": 2,
+    "codigoQr": "CV-QR-0D1E2F20",
+    "precioUnitario": 6000,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-10-02T16:40:55.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 21,
+    "espectadorId": 1,
+    "eventoId": 3,
+    "codigoQr": "CV-QR-6A7B8C21",
+    "precioUnitario": 5000,
+    "estado": "UTILIZADO",
+    "createdAt": "2026-10-03T10:15:00.000Z",
+    "fechaValidacionPuerta": "2026-10-06T22:00:45.000Z"
+  },
+  {
+    "id": 22,
+    "espectadorId": 2,
+    "eventoId": 4,
+    "codigoQr": "CV-QR-3D4E5F22",
+    "precioUnitario": 7500,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-10-03T18:25:10.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 23,
+    "espectadorId": 3,
+    "eventoId": 5,
+    "codigoQr": "CV-QR-9A0B1C23",
+    "precioUnitario": 3800,
+    "estado": "RESERVADO",
+    "createdAt": "2026-10-04T11:50:00.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 24,
+    "espectadorId": 4,
+    "eventoId": 1,
+    "codigoQr": "CV-QR-4D5E6F24",
+    "precioUnitario": 4500,
+    "estado": "CONFIRMADO",
+    "createdAt": "2026-10-04T14:10:20.000Z",
+    "fechaValidacionPuerta": null
+  },
+  {
+    "id": 25,
+    "espectadorId": 5,
+    "eventoId": 2,
+    "codigoQr": "CV-QR-8D9E0A25",
+    "precioUnitario": 6000,
+    "estado": "CANCELADO",
+    "createdAt": "2026-10-05T09:05:00.000Z",
+    "fechaValidacionPuerta": null
+  }
+]
