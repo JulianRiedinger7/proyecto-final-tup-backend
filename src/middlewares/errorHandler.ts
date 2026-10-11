@@ -7,5 +7,5 @@ export function errorHandler(err: any, _req: Request, res: Response, _next: Next
   const code = err.statusCode || err.status || 500;
   const msg = code === 500 ? 'Error interno del servidor' : err.message || 'Ocurrio un error';
 
-  res.status(code).json(errorResponse(msg, code));
+  errorResponse(res, msg, code);
 }
