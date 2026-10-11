@@ -1,11 +1,12 @@
 import initialTickets from '../../data/tickets.json';
 import type { Ticket, TicketEstado, TicketSortBy, TicketSortOrder } from '../models/Ticket';
-import type { NewTicket, TicketFilterParams } from '../schemas/ticket.schema';
+import type { NewTicket, PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
 
 interface ITicketRepository {
   findAll(params?: TicketFilterParams): Promise<{ items: Ticket[]; total: number }>;
   findById(id: number): Promise<Ticket | undefined>;
   create(ticket: NewTicket): Promise<Ticket>;
+  update(id: number, ticket: PatchTicket): Promise<Ticket | undefined>;
   delete(id: number): Promise<Ticket | undefined>;
 }
 
@@ -48,6 +49,21 @@ export class TicketRepository implements ITicketRepository {
     };
     this.tickets.push(newTicket);
     return Promise.resolve(newTicket);
+  }
+
+  async update(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
+    const existingTicketIndex = this.tickets.findIndex((t) => t.id === id);
+    if (existingTicketIndex === -1) {
+      return Promise.resolve(undefined);
+    }
+
+    const updatedTicket = {
+      ...this.tickets[existingTicketIndex],
+      ...ticket,
+    };
+
+    this.tickets[existingTicketIndex] = updatedTicket;
+    return Promise.resolve(updatedTicket);
   }
 
   async delete(id: number): Promise<Ticket | undefined> {

@@ -57,4 +57,19 @@ export class TicketController {
       return errorResponse(res, 'Error al eliminar el ticket', 500);
     }
   };
+
+  update = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id } = req.params as unknown as TicketIdParams;
+      const ticketData = req.body;
+      const updatedTicket = await this.repo.update(id, ticketData);
+      if (!updatedTicket) {
+        return errorResponse(res, 'Ticket no encontrado', 404);
+      }
+      return successResponse(res, 'Ticket actualizado', 200, updatedTicket);
+    } catch (error) {
+      console.error(`Error al actualizar el ticket: ${error}`);
+      return errorResponse(res, 'Error al actualizar el ticket', 500);
+    }
+  };
 }

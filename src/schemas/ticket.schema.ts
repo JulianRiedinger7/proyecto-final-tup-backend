@@ -28,3 +28,9 @@ export const newTicketSchema = z.object({
 });
 
 export type NewTicket = z.infer<typeof newTicketSchema>;
+
+export const patchTicketSchema = z.object({
+  estado: z.enum(TICKET_ESTADOS),
+});
+
+export type PatchTicket = z.infer<typeof patchTicketSchema>;
