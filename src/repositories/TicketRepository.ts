@@ -24,10 +24,11 @@ export class TicketRepository implements ITicketRepository {
 
     let result = this.filterTickets(this.tickets, search, estado, espectadorId, eventoId);
     result = this.sortTickets(result, sortBy, sortOrder);
+    result = this.paginateTickets(result, page, limit);
 
     return Promise.resolve({
-      items: this.paginateTickets(result, page, limit),
-      total: limit ?? result.length,
+      items: result,
+      total: result.length,
     });
   }
 
