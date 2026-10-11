@@ -45,7 +45,7 @@ export class TicketRepository implements ITicketRepository {
     sortBy: TicketSortBy,
     sortOrder: TicketSortOrder,
   ): Ticket[] {
-    return tickets.sort((ticketA, ticketB) => {
+    return [...tickets].sort((ticketA, ticketB) => {
       const valueA = ticketA[sortBy];
       const valueB = ticketB[sortBy];
 
@@ -53,13 +53,15 @@ export class TicketRepository implements ITicketRepository {
       if (valueB === undefined || valueB === null) return -1;
 
       if (valueA < valueB) return sortOrder === 'asc' ? -1 : 1;
-      if (valueA > valueB) return 1;
+      if (valueA > valueB) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
   }
 
   private paginateTickets(tickets: Ticket[], page?: number, limit?: number): Ticket[] {
-    if (!page || !limit) return tickets;
+    if (page === undefined || limit === undefined) return tickets;
+    if (!Number.isInteger(page) || !Number.isInteger(limit) || page < 1 || limit < 1)
+      return tickets;
 
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
