@@ -28,9 +28,15 @@ export class App {
   }
 
   private setupRoutes(): void {
-    this.instance.use(errorHandler);
     this.instance.use('/api/v1/tickets', new TicketRoutes().getRoutes());
     this.instance.get('/api/v1/health', (_req, res) => successResponse(res, 'Status OK', 200, {}));
+
+    this.instance.use((_req, _res, next) => {
+      const error: any = new Error('Ruta no encontrada');
+      error.statusCode = 404;
+      next(error);
+    });
+    this.instance.use(errorHandler);
   }
 
   public listen(port: number, onReady?: () => void): import('node:http').Server {
