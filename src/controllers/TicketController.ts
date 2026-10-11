@@ -32,4 +32,29 @@ export class TicketController {
       return errorResponse(res, 'Error al buscar el ticket', 500);
     }
   };
+
+  create = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const ticketData = req.body;
+      const newTicket = await this.repo.create(ticketData);
+      return successResponse(res, 'Ticket creado', 201, newTicket);
+    } catch (error) {
+      console.error(`Error al crear el ticket: ${error}`);
+      return errorResponse(res, 'Error al crear el ticket', 500);
+    }
+  };
+
+  delete = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id } = req.params as unknown as TicketIdParams;
+      const deletedTicket = await this.repo.delete(id);
+      if (!deletedTicket) {
+        return errorResponse(res, 'Ticket no encontrado', 404);
+      }
+      return successResponse(res, 'Ticket eliminado', 200, deletedTicket);
+    } catch (error) {
+      console.error(`Error al eliminar el ticket: ${error}`);
+      return errorResponse(res, 'Error al eliminar el ticket', 500);
+    }
+  };
 }

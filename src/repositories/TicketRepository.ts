@@ -1,10 +1,12 @@
 import initialTickets from '../../data/tickets.json';
 import type { Ticket, TicketEstado, TicketSortBy, TicketSortOrder } from '../models/Ticket';
-import type { TicketFilterParams } from '../schemas/ticket.schema';
+import type { NewTicket, TicketFilterParams } from '../schemas/ticket.schema';
 
 interface ITicketRepository {
   findAll(params?: TicketFilterParams): Promise<{ items: Ticket[]; total: number }>;
   findById(id: number): Promise<Ticket | undefined>;
+  create(ticket: NewTicket): Promise<Ticket>;
+  delete(id: number): Promise<Ticket | undefined>;
 }
 
 export class TicketRepository implements ITicketRepository {
@@ -34,6 +36,26 @@ export class TicketRepository implements ITicketRepository {
 
   async findById(id: number): Promise<Ticket | undefined> {
     return Promise.resolve(this.tickets.find((ticket) => ticket.id === id));
+  }
+
+  async create(ticket: NewTicket): Promise<Ticket> {
+    const newTicket: Ticket = {
+      id: this.tickets.length + 1,
+      codigoQr: `CV-QR-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+      createdAt: new Date().toISOString(),
+      fechaValidacionPuerta: null,
+      ...ticket,
+    };
+    this.tickets.push(newTicket);
+    return Promise.resolve(newTicket);
+  }
+
+  async delete(id: number): Promise<Ticket | undefined> {
+    const ticket = await this.findById(id);
+    if (ticket) {
+      this.tickets = this.tickets.filter((tickets) => tickets.id !== id);
+    }
+    return ticket;
   }
 
   private sortTickets(
