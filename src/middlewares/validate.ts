@@ -1,27 +1,29 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { ZodError, ZodType } from 'zod';
 
-function errorMessage(error: ZodError): string {
+function errorMessage(error: ZodError, source: RequestPart): string {
   const issues: string[] = [];
   for (const issue of error.issues) {
-    const field = issue.path.join('.') || 'body';
+    const field = issue.path.join('.') || source;
     issues.push(`${field}: ${issue.message}`);
   }
   return `Datos inválidos: ${issues.join('; ')}`;
 }
 
-export function validate(schema: ZodType) {
+type RequestPart = 'body' | 'query' | 'params';
+
+export function validate(schema: ZodType, source: RequestPart = 'body') {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.body);
+    const result = schema.safeParse(req[source]);
 
     if (!result.success) {
-      const error: any = new Error(errorMessage(result.error));
+      const error: any = new Error(errorMessage(result.error, source));
       error.statusCode = 400;
       next(error);
       return;
     }
 
-    req.body = result.data;
+    req[source] = result.data;
     next();
   };
 }
