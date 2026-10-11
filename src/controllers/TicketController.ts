@@ -1,29 +1,15 @@
 import type { Request, Response } from 'express';
-import type { TicketFilterParams } from '../models/Ticket';
-import { TicketRepository } from '../repositories/TicketRepository';
+import type { TicketRepository } from '../repositories/TicketRepository';
+import type { TicketFilterParams, TicketIdParams } from '../schemas/ticket.schema';
 import { errorResponse, successResponse } from '../utils/response';
 
 export class TicketController {
-  private repo: TicketRepository;
-
-  constructor() {
-    this.repo = new TicketRepository();
-  }
+  constructor(private readonly repo: TicketRepository) {}
 
   findAll = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { page, limit, sortBy, sortOrder, search, estado, espectadorId, eventoId } =
-        req.query as TicketFilterParams;
-      const tickets = await this.repo.findAll({
-        page,
-        limit,
-        sortBy,
-        sortOrder,
-        search,
-        estado,
-        espectadorId,
-        eventoId,
-      });
+      const filters = req.query as unknown as TicketFilterParams;
+      const tickets = await this.repo.findAll(filters);
       return successResponse(res, 'Tickets encontrados', 200, tickets);
     } catch (error) {
       console.error(`Error al buscar los tickets: ${error}`);
@@ -33,11 +19,7 @@ export class TicketController {
 
   findById = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const id = Number(req.params.id);
-
-      if (Number.isNaN(id)) {
-        return errorResponse(res, 'ID no es un numero', 400);
-      }
+      const { id } = req.params as unknown as TicketIdParams;
 
       const ticket = await this.repo.findById(id);
 

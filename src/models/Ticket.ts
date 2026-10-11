@@ -1,4 +1,10 @@
-export type TicketEstado = 'RESERVADO' | 'CONFIRMADO' | 'UTILIZADO' | 'CANCELADO';
+export const TICKET_ESTADOS = ['RESERVADO', 'CONFIRMADO', 'UTILIZADO', 'CANCELADO'] as const;
+
+export const TICKET_SORT_BY = ['id', 'precioUnitario', 'estado', 'createdAt'] as const;
+
+export const TICKET_SORT_ORDER = ['asc', 'desc'] as const;
+
+export type TicketEstado = (typeof TICKET_ESTADOS)[number];
 
 export interface Ticket {
   id: number;
@@ -11,16 +17,5 @@ export interface Ticket {
   fechaValidacionPuerta: string | null;
 }
 
-export type TicketSortBy = 'id' | 'precioUnitario' | 'estado' | 'createdAt';
-export type TicketSortOrder = 'asc' | 'desc';
-
-export interface TicketFilterParams {
-  page?: number;
-  limit?: number;
-  sortBy?: TicketSortBy;
-  sortOrder?: TicketSortOrder;
-  search?: string;
-  estado?: TicketEstado;
-  eventoId?: number;
-  espectadorId?: number;
-}
+export type TicketSortBy = (typeof TICKET_SORT_BY)[number];
+export type TicketSortOrder = (typeof TICKET_SORT_ORDER)[number];

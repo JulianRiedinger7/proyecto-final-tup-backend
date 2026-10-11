@@ -1,11 +1,6 @@
 import initialTickets from '../../data/tickets.json';
-import type {
-  Ticket,
-  TicketEstado,
-  TicketFilterParams,
-  TicketSortBy,
-  TicketSortOrder,
-} from '../models/Ticket';
+import type { Ticket, TicketEstado, TicketSortBy, TicketSortOrder } from '../models/Ticket';
+import type { TicketFilterParams } from '../schemas/ticket.schema';
 
 interface ITicketRepository {
   findAll(params?: TicketFilterParams): Promise<{ items: Ticket[]; total: number }>;
@@ -17,7 +12,7 @@ export class TicketRepository implements ITicketRepository {
 
   async findAll(params: TicketFilterParams = {}): Promise<{ items: Ticket[]; total: number }> {
     const {
-      page,
+      page = 1,
       limit,
       sortBy = 'id',
       sortOrder = 'asc',
@@ -32,7 +27,7 @@ export class TicketRepository implements ITicketRepository {
 
     return Promise.resolve({
       items: this.paginateTickets(result, page, limit),
-      total: result.length,
+      total: limit ?? result.length,
     });
   }
 
@@ -58,11 +53,11 @@ export class TicketRepository implements ITicketRepository {
     });
   }
 
-  private paginateTickets(tickets: Ticket[], page?: number, limit?: number): Ticket[] {
-    if (page === undefined || limit === undefined) return tickets;
-    if (!Number.isInteger(page) || !Number.isInteger(limit) || page < 1 || limit < 1)
-      return tickets;
-
+  private paginateTickets(
+    tickets: Ticket[],
+    page: number,
+    limit: number = tickets.length,
+  ): Ticket[] {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     return tickets.slice(startIndex, endIndex);
