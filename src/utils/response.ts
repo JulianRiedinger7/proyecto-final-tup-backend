@@ -1,24 +1,25 @@
-export interface APIResponse<T> {
-  msg: string;
-  code: number;
-  data?: T;
-}
+import type { Response } from 'express';
 
 export function successResponse<T>(
-  msg: string = 'Ok',
+  res: Response,
+  msg: string = 'Operacion exitosa',
   code: number = 200,
   data: T,
-): APIResponse<T> {
-  return {
+): Response {
+  return res.status(code).json({
     msg,
     code,
     data,
-  };
+  });
 }
 
-export function errorResponse(msg: string, code: number): APIResponse<void> {
-  return {
+export function errorResponse(
+  res: Response,
+  msg: string = 'Error interno del servidor',
+  code: number = 500,
+): Response {
+  return res.status(code).json({
     msg,
     code,
-  };
+  });
 }

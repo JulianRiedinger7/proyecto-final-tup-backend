@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
 import { errorHandler } from './middlewares/errorHandler';
+import { TicketRoutes } from './routes/TicketRoutes';
 import { successResponse } from './utils/response';
 
 export class App {
@@ -23,33 +24,22 @@ export class App {
       }),
     );
     this.instance.use(express.json());
-    this.instance.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'development'));
+    this.instance.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
   }
 
   private setupRoutes(): void {
-    this.instance.get('/', (_req, res) => {
-      res.json(
-        successResponse('Ok', 200, {
-          name: 'proyecto-final-backend',
-          docs: '/api/health',
-        }),
-      );
-    });
+    this.instance.use('/api/v1/tickets', new TicketRoutes().getRoutes());
+    this.instance.get('/api/v1/health', (_req, res) => successResponse(res, 'Status OK', 200, {}));
 
-    this.instance.get('/api/health', (_req, res) => {
-      res.json(
-        successResponse('Ok', 200, {
-          status: 'ok',
-          service: 'proyecto-final-backend',
-          timestamp: new Date().toISOString(),
-        }),
-      );
+    this.instance.use((_req, _res, next) => {
+      const error: any = new Error('Ruta no encontrada');
+      error.statusCode = 404;
+      next(error);
     });
-
     this.instance.use(errorHandler);
   }
 
-  public listen(port: number, onReady?: () => void): void {
-    this.instance.listen(port, onReady);
+  public listen(port: number, onReady?: () => void): import('node:http').Server {
+    return this.instance.listen(port, onReady);
   }
 }
