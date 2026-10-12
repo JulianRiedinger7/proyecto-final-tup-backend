@@ -21,10 +21,13 @@ export class EspectadorController {
     try {
       const id = Number(req.params.id);
       const espectadores = await this.repo.findByID(id);
+      if (!espectadores) {
+        return errorResponse(res, 'Espectador no encontrado', 404);
+      }
       return successResponse(res, 'Espectador encontrado', 200, espectadores);
     } catch (error) {
       console.error('No se encontró al espectador', error);
-      return errorResponse(res, 'Error al buscar a este espectaddor');
+      return errorResponse(res, 'Error al buscar a este espectaddor', 500);
     }
   };
 
@@ -32,7 +35,7 @@ export class EspectadorController {
     try {
       const EspectadorData = req.body;
       const NuevoEspectador = await this.repo.create(EspectadorData);
-      return successResponse(res, 'Espectador creado', 200, NuevoEspectador);
+      return successResponse(res, 'Espectador creado', 201, NuevoEspectador);
     } catch (error) {
       console.error('Error al crear el espectador', error);
       return errorResponse(res, 'Error al crear el espectador', 500);
@@ -44,22 +47,27 @@ export class EspectadorController {
       const id = Number(req.params.id);
       const espectadorData = req.body;
       const espectador = await this.repo.update(id, espectadorData);
+      if (!espectador) {
+        return errorResponse(res, 'Espectador no encontrado', 404);
+      }
       return successResponse(res, 'Espectador actualizado', 200, espectador);
     } catch (error) {
       console.error(`Error al actualizar el espectador: ${error}`);
-      return errorResponse(res, 'Error al actualizar el espectador', 500);
+      return errorResponse(res, 'Error al actualizar el espectador', 404);
     }
   };
 
   delete = async (req: Request, res: Response): Promise<Response> => {
     try {
       const id = Number(req.params.id);
-      const _espectadorData = req.body;
       const espectador = await this.repo.delete(id);
+      if (!espectador) {
+        return errorResponse(res, 'Espectador no encontrado', 404);
+      }
       return successResponse(res, 'Espectador eliminado', 200, espectador);
     } catch (error) {
       console.error(`Error al borrar el espectador: ${error}`);
-      return errorResponse(res, 'Error al borrar el espectador', 500);
+      return errorResponse(res, 'Error al borrar el espectador', 404);
     }
   };
 }
