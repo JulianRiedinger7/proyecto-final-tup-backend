@@ -1,4 +1,3 @@
-//import { promise } from 'zod';
 import listaEspectadores from '../../data/espectadores.json';
 import type {
   Espectadores,
@@ -13,6 +12,10 @@ import type {
 
 interface IEspectadorRepository {
   findAll(params?: EspectadoresFilterParams): Promise<{ items: Espectadores[]; total: number }>;
+  findByID(id: number): Promise<Espectadores | undefined>;
+  create(params: NewEspectador): Promise<Espectadores>;
+  update(id: number, cambiosEspectador: PatchEspectador): Promise<Espectadores | undefined>;
+  delete(id: number): Promise<Espectadores | undefined>;
 }
 
 const DEFAULT_LIMIT = 10;
@@ -73,7 +76,7 @@ export class EspectadorRepository implements IEspectadorRepository {
   }
 
   async create(espectador: NewEspectador): Promise<Espectadores> {
-    const NewEspectador: Espectadores = {
+    const EspectadorNuevo: Espectadores = {
       id: this.espectadores.length + 1,
       nombre: espectador.nombre,
       apellido: espectador.apellido,
@@ -83,8 +86,8 @@ export class EspectadorRepository implements IEspectadorRepository {
       createdAt: new Date(),
       isActive: true,
     };
-    this.espectadores.push(NewEspectador);
-    return Promise.resolve(NewEspectador);
+    this.espectadores.push(EspectadorNuevo);
+    return Promise.resolve(EspectadorNuevo);
   }
 
   async update(id: number, cambiosEspectador: PatchEspectador): Promise<Espectadores | undefined> {
