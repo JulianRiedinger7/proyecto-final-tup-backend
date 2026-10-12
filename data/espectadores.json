@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "nombre": "Ana",
+    "apellido": "Pérez",
+    "email": "ana.perez@mail.com",
+    "dni": "30111222",
+    "telefono": "2914001001",
+    "created_at": "2025-01-10T09:00:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "nombre": "Luis",
+    "apellido": "Gómez",
+    "email": "luis.gomez@mail.com",
+    "dni": "28333444",
+    "telefono": "2914001002",
+    "created_at": "2025-01-22T14:30:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 3,
+    "nombre": "María",
+    "apellido": "López",
+    "email": "maria.lopez@mail.com",
+    "dni": "35555666",
+    "telefono": "2914001003",
+    "created_at": "2025-02-03T11:15:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 4,
+    "nombre": "Carlos",
+    "apellido": "Díaz",
+    "email": "carlos.diaz@mail.com",
+    "dni": "27777888",
+    "telefono": "2914001004",
+    "created_at": "2025-02-15T16:45:00.000Z",
+    "is_active": false
+  },
+  {
+    "id": 5,
+    "nombre": "Lucía",
+    "apellido": "Fernández",
+    "email": "lucia.fernandez@mail.com",
+    "dni": "33999000",
+    "telefono": "2914001005",
+    "created_at": "2025-03-01T08:20:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 6,
+    "nombre": "Javier",
+    "apellido": "Romero",
+    "email": "javier.romero@mail.com",
+    "dni": "31222333",
+    "telefono": "2914001006",
+    "created_at": "2025-03-18T19:00:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 7,
+    "nombre": "Sofía",
+    "apellido": "Martínez",
+    "email": "sofia.martinez@mail.com",
+    "dni": "38444555",
+    "telefono": "2914001007",
+    "created_at": "2025-04-05T10:10:00.000Z",
+    "is_active": false
+  },
+  {
+    "id": 8,
+    "nombre": "Martín",
+    "apellido": "Acosta",
+    "email": "martin.acosta@mail.com",
+    "dni": "29666777",
+    "telefono": "2914001008",
+    "created_at": "2025-04-27T13:35:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 9,
+    "nombre": "Valentina",
+    "apellido": "Sosa",
+    "email": "valentina.sosa@mail.com",
+    "dni": "40111222",
+    "telefono": "2914001009",
+    "created_at": "2025-05-12T17:50:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 10,
+    "nombre": "Diego",
+    "apellido": "Torres",
+    "email": "diego.torres@mail.com",
+    "dni": "26888999",
+    "telefono": "2914001010",
+    "created_at": "2025-06-02T09:40:00.000Z",
+    "is_active": true
+  },
+  {
+    "id": 11,
+    "nombre": "Camila",
+    "apellido": "Ruiz",
+    "email": "camila.ruiz@mail.com",
+    "dni": "36777111",
+    "telefono": "2914001011",
+    "created_at": "2025-06-20T12:05:00.000Z",
+    "is_active": false
+  },
+  {
+    "id": 12,
+    "nombre": "Nicolás",
+    "apellido": "Benítez",
+    "email": "nicolas.benitez@mail.com",
+    "dni": "32555444",
+    "telefono": "2914001012",
+    "created_at": "2025-07-08T15:25:00.000Z",
+    "is_active": true
+  }
+]
