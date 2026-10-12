@@ -2,7 +2,12 @@ import { Router } from 'express';
 import { EspectadorController } from '../controllers/EspectadorController';
 import { validate } from '../middlewares/validate';
 import { EspectadorRepository } from '../repositories/EspectadoresRepository';
-import { espectadoresQuerySchema } from '../schemas/espectador.schema';
+import {
+  deleteEspectadorSchema,
+  espectadoresQuerySchema,
+  newEspectadorSchema,
+  patchEspectadorSchema,
+} from '../schemas/espectador.schema';
 
 export class EspectadorRoutes {
   private router: Router;
@@ -14,6 +19,15 @@ export class EspectadorRoutes {
 
   private initRoutes(): void {
     this.router.get('/', validate(espectadoresQuerySchema, 'query'), this.controller.findAll);
+    this.router.get('/:id', validate(deleteEspectadorSchema, 'params'), this.controller.findByID);
+    this.router.post('/', validate(newEspectadorSchema, 'body'), this.controller.create);
+    this.router.patch(
+      '/:id',
+      validate(deleteEspectadorSchema, 'params'),
+      validate(patchEspectadorSchema, 'body'),
+      this.controller.update,
+    );
+    this.router.delete('/:id', validate(deleteEspectadorSchema, 'params'), this.controller.delete);
   }
 
   getRoutes(): Router {
