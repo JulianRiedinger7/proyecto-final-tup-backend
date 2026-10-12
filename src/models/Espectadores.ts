@@ -9,7 +9,7 @@ export interface Espectadores {
   email: string;
   dni: string;
   telefono: string;
-  createdAt: string;
+  createdAt: Date;
   isActive: boolean;
 }
 
