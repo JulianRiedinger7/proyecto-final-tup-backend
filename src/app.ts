@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { env } from './config/env';
 import { errorHandler } from './middlewares/errorHandler';
 import { EspectadorRoutes } from './routes/EspectadorRoutes';
+import { EventoRoutes } from './routes/EventoRoutes';
 import { TicketRoutes } from './routes/TicketRoutes';
 import { successResponse } from './utils/response';
 
@@ -29,6 +30,7 @@ export class App {
   }
 
   private setupRoutes(): void {
+    this.instance.use('/api/v1/eventos', new EventoRoutes().getRoutes());
     this.instance.use('/api/v1/tickets', new TicketRoutes().getRoutes());
     this.instance.use('/api/v1/espectadores', new EspectadorRoutes().getRoutes());
     this.instance.get('/api/v1/health', (_req, res) => successResponse(res, 'Status OK', 200, {}));
