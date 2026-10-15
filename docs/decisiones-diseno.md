@@ -47,4 +47,32 @@ Analizando las relaciones y comunicaciones entre los distintos módulos del sist
 
 #### Decision:
 
-**_Conservar el diseño actual (Sin patrones estructural)_** : Siguiendo la teoría entendemos que el patrón viene después de un problema real de diseño. Como no encontramos un problema de acoplamiento estructural, incompatibilidad de interfaces ni necesidad de extensión de comportamiento, decidimos no forzar la implementación de ningún patrón estructural. Mantener la arquitectura actual nos evita sumar complejidad innecesaria.
+**_Conservar el diseño actual (Sin patrones estructurales)_** : Siguiendo la teoría entendemos que el patrón viene después de un problema real de diseño. Como no encontramos un problema de acoplamiento estructural, incompatibilidad de interfaces ni necesidad de extensión de comportamiento, decidimos no forzar la implementación de ningún patrón estructural. Mantener la arquitectura actual nos evita sumar complejidad innecesaria.
+
+### Clase 6 Patrones de Comportamiento
+
+#### Codigo analizado: [src/](../src/) (Controllers, Services, Repositories, Routes)
+
+#### Diagnostico:
+
+Al analizar el comportamiento y la colaboración entre los distintos módulos del backend de **CircuitoVivo**, y al igual que como nos sucedio con los patrones estructurales, llegamos a la conclusion que aplica la misma teoria: `los patrones vienen despues del problema`.
+
+Actualmente, el flujo de ejecución en nuestro sistema es directo. No detectamos un acoplamiento significativo en la interacción entre componentes ni una acumulación compleja de condicionales que justifique la introducción de clases adicionales.
+
+#### Alternativas y sus trade-offs
+
+- **_Observer_**: En el estado actual del sistema no contamos con ningun tipo de reaccion ante cambios (notificaciones, emails, metricas, etc), pero consideramos que a futuro este patron podria llegar a ser considerado en el modulo de **Eventos**. Por ejemplo, si necesitamos enviar notificaciones o correos, tanto a **Bandas como Espectadores (Consumidores)** cuando cambia el horario de un **Evento (Emisor)**. Sin embargo, introducir este tipo de infraestructura interna volvería menos evidente el flujo de ejecución y dificultaría la depuración.
+
+- **_Strategy_**: Actualmente, las reglas de nuestro backend son sencillas. Resolverlas mediante condicionales no nos genera mayores problemas de mantenibilidad. A futuro, nos puede ocurrir que, por ejemplo, la logica de precios evolucione (entradas anticipadas/en puerta) con distintas reglar que aplicar. En ese momento, un patron **Strategy** nos permitiria aislar cada logica en su propia clase sin necesidad de condicionales complejos.
+
+- **_Command_**: Analizamos su aplicación para encapsular solicitudes de reserva o compra de entradas como objetos manipulables. En la actualidad, las peticiones se procesan de forma inmediata en el ciclo de solicitud-respuesta HTTP. Crear objetos comando añadiría indirección y clases adicionales sin un motivo claro. **A futuro**, si surge la necesidad de diferir tareas en colas de trabajo, ejecutar reintentos automáticos (retries) o registrar un historial auditable de acciones, **Command** será la alternativa adecuada para desacoplar la ejecución de la solicitud.
+
+- **_Command_**: En la actualidad, las peticiones se procesan de forma inmediata en el ciclo de solicitud y respuesta HTTP. Crear este tipo de objetos añadiría clases innecesarias. A futuro podemos analizar su aplicacion en el modulo de **Tickets** si surge la necesidad de representarlos como una accion manipulable, por ejemplo rehacer un ticket ante el fallo de un pago, esperar un pago o reimprimir ticket, **Command** seria la alternativa adecuada.
+
+#### Decision:
+
+**_Conservar el diseño actual (Sin patrones de comportamiento)_**: Como ocurrio con los patrones estructurales, consideramos que no debemos aplicar patrones antes de que surjan los problemas, ya que recaeriamos en sobreigenieria innecesaria. Sin embargo, tuvimos en consideracion posibles inconvenientes a futuro en el desarrollo del proyecto y en como estos Patrones de comportamiento podrian sernos de utilidad.
+
+### Clase 7 Refactoring, Clean Code y SOLID
+
+#### Codigo analizado: [src/](../src/) (Controllers, Services, Repositories, Routes)
