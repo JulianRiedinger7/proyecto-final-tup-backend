@@ -29,7 +29,7 @@ De esta forma, cada `Route` solo solicita a la `Factory` el Controller que neces
 
 ### Clase 5 Patrones Estructurales
 
-#### Codigo analizado: [src/](../src/) (Controllers, Services, Repositories, Routes)
+#### Codigo analizado: [Repositories](../src/repositories), [Controllers](../src/controllers), [Routes](../src/routes)
 
 #### Diagnostico:
 
@@ -51,7 +51,7 @@ Analizando las relaciones y comunicaciones entre los distintos módulos del sist
 
 ### Clase 6 Patrones de Comportamiento
 
-#### Codigo analizado: [src/](../src/) (Controllers, Services, Repositories, Routes)
+#### Codigo analizado: [Repositories](../src/repositories), [Controllers](../src/controllers), [Routes](../src/routes), [Schemas](../src/schemas/)
 
 #### Diagnostico:
 
@@ -61,13 +61,11 @@ Actualmente, el flujo de ejecución en nuestro sistema es directo. No detectamos
 
 #### Alternativas y sus trade-offs
 
-- **_Observer_**: En el estado actual del sistema no contamos con ningun tipo de reaccion ante cambios (notificaciones, emails, metricas, etc), pero consideramos que a futuro este patron podria llegar a ser considerado en el modulo de **Eventos**. Por ejemplo, si necesitamos enviar notificaciones o correos, tanto a **Bandas como Espectadores (Consumidores)** cuando cambia el horario de un **Evento (Emisor)**. Sin embargo, introducir este tipo de infraestructura interna volvería menos evidente el flujo de ejecución y dificultaría la depuración.
+- **_Observer_**: En el estado actual del sistema no contamos con ningun objeto que deba reaccionar ante cambios de otro objeto (notificaciones, emails, metricas, etc), pero consideramos que a futuro este patron podria llegar a ser considerado en el modulo de **Eventos**. Por ejemplo, si necesitamos enviar notificaciones o correos, tanto a **Bandas como Espectadores (Consumidores)** cuando cambia el horario de un **Evento (Emisor)**. Sin embargo, introducir este tipo de infraestructura interna volvería menos evidente el flujo de ejecución y dificultaría la depuración.
 
-- **_Strategy_**: Actualmente, las reglas de nuestro backend son sencillas. Resolverlas mediante condicionales no nos genera mayores problemas de mantenibilidad. A futuro, nos puede ocurrir que, por ejemplo, la logica de precios evolucione (entradas anticipadas/en puerta) con distintas reglar que aplicar. En ese momento, un patron **Strategy** nos permitiria aislar cada logica en su propia clase sin necesidad de condicionales complejos.
+- **_Strategy_**: Actualmente, las reglas de nuestro backend son sencillas. Por ejemplo, basandonos en `Tickets` con sus precios, hoy lo manda el cliente (**precioUnitario** en **newTicketSchema**). Sin embargo, a futuro, nos puede ocurrir que la logica de precios evolucione (entradas anticipadas/en puerta) con distintas reglar que aplicar. En ese momento, un patron **Strategy** nos permitiria aislar cada logica en su propia clase sin necesidad de condicionales complejos.
 
-- **_Command_**: Analizamos su aplicación para encapsular solicitudes de reserva o compra de entradas como objetos manipulables. En la actualidad, las peticiones se procesan de forma inmediata en el ciclo de solicitud-respuesta HTTP. Crear objetos comando añadiría indirección y clases adicionales sin un motivo claro. **A futuro**, si surge la necesidad de diferir tareas en colas de trabajo, ejecutar reintentos automáticos (retries) o registrar un historial auditable de acciones, **Command** será la alternativa adecuada para desacoplar la ejecución de la solicitud.
-
-- **_Command_**: En la actualidad, las peticiones se procesan de forma inmediata en el ciclo de solicitud y respuesta HTTP. Crear este tipo de objetos añadiría clases innecesarias. A futuro podemos analizar su aplicacion en el modulo de **Tickets** si surge la necesidad de representarlos como una accion manipulable, por ejemplo rehacer un ticket ante el fallo de un pago, esperar un pago o reimprimir ticket, **Command** seria la alternativa adecuada.
+- **_Command_**: En la actualidad, las peticiones se procesan de forma inmediata en el ciclo de solicitud y respuesta HTTP. Crear este tipo de objetos añadiría clases innecesarias. A futuro podemos analizar su aplicacion en el modulo de **Tickets** si surge la necesidad de representar la accion de pagos como un objeto y asi poder manipularlo, por ejemplo rehacer un ticket ante el fallo de un pago, esperar un pago o reimprimir ticket.
 
 #### Decision:
 
@@ -75,4 +73,71 @@ Actualmente, el flujo de ejecución en nuestro sistema es directo. No detectamos
 
 ### Clase 7 Refactoring, Clean Code y SOLID
 
-#### Codigo analizado: [src/](../src/) (Controllers, Services, Repositories, Routes)
+#### Codigo analizado: [Controllers](../src/controllers), [Repositories](../src/repositories), [Routes](../src/routes) y [errorHandler](../src/middlewares/errorHandler.ts)
+
+#### Diagnostico:
+
+Al analizar el backend de **CircuitoVivo** consideramos que el sistema funciona de manera clara y directa, pero existen ciertos puntos donde arrastrar la **deuda tecnica** nos puede perjudicar y es mejor crear la estrategia para modificarlo:
+
+1. Los controllers repiten el mismo manejo de errores en cada metodo.
+2. Las rutas y los controllers conocen como se instancian sus dependencias (mostrado en la Clase 4).
+3. Existe una regla de negocio dentro de un repository (ver Code Smells).
+
+#### Analisis:
+
+- **_Deuda Tecnica_**: Los datos estan **mockeados en memoria**: los repositories cargan un archivo local (`data/espectadores.json`, `data/tickets.json`, los eventos estan escritos en la propia clase) y **no escriben realmente en los archivos**, por lo que los cambios se pierden al reiniciar el server.
+
+  Consideramos que es una **deuda tecnica consciente** ya que nos permitio avanzar con la logica de la API sin pensar en una base de datos real. Sabemos y registramos esta solucion momentanea teniendo la estrategia necesaria para migrar a una base de datos real.
+
+- **_Code Smells y Refactoring_**:
+  - **Acoplamiento Rutas**: como se menciono en la Clase 4, cada `Route` conoce como se instancia su `Controller` y el `Repository`. Lo resolveriamos con `ControllerFactory`. Hoy el costo es bajo, pero crece con cada entidad y con la futura capa de `Services`: la Factory concentra ese cambio en un solo lugar. Esto seria un **Refactoring** ya que afecta internamente pero no de forma externa para el usuario.
+
+- **_Clean Code_**:
+  - **Nombres Significativos y Metodos Coherentes**: en general nombramos los distintos modulos con intencion (`findAll`, `EventoRepository`, `codigoQr`). Sin embargo detectamos algunas inconsistencias puntuales a corregir: por ejemplo, el archivo `EspectadoresRepository.ts` contiene la clase `EspectadorRepository`.
+  - **Simplicidad Contextual**: nos basamos en la idea de que la solucion debe ser proporcional al problema, y por eso no incorporamos patrones o capas que el estado actual aun no justifica.
+
+- **_Principios SOLID_**:
+  - **_SRP_**: Consideramos que en general lo cumplimos (rutas definen los endpoints, controllers conocen sobre HTTP, repositories acceden a datos). Sin embargo consideramos una excepcion: los controllers tambien deciden **como se maneja y se loguea cada error**.
+  - **_DIP_**: Actualmente las rutas instancian directamente los controllers y el repository. La Factory (`ControllerFactory`) permitiria que el nivel alto dependa de abstracciones. Por otro lado, los controllers dependen de la clase concreta del repository (`repo: EventoRepository`), cuando deberian depender del contrato de las interfaces (`IEventoRepository`, etc.).
+  - **_ISP_**: Consideramos cumplirlo al declarar interfaces (`ITicketRepository`, `IEspectadorRepository`) pequeñas y bien definidas, siendo correctamente cumplidos por las clases.
+  - **_OCP, LSP_**: por ahora no encontramos evidencia real comparable en nuestro codigo.
+
+#### Caso principal: manejo de errores en los controllers
+
+#### Codigo analizado
+
+Los tres controllers ([TicketController](../src/controllers/EspectadorController.ts), [EspectadorController](../src/controllers/EspectadorController.ts), [EventoController](../src/config/EventoController.ts)). Y [errorHandler](../src/middlewares/errorHandler.ts) global.
+
+#### Evidencia (code smell)
+
+Cada metodo de los controllers repite la misma estructura: ` catch (error) { console.error(...); return errorResponse(res, '...', 500); }` y en ningun momento estamos aprovechando el `errorHandler` global para no repetirnos.
+
+Osea hay una duplicacion de conocimiento, ya que existen dos mecanismos distintos para manejo de errores conviviendo (`catch` y `errorHandler`)
+
+Esto tambien nos hacer romper el **SRP** en los controladores, ya que no solo tienen la responsabilidad de los metodos HTTP, sino tambien de como decidir sobre los errores.
+
+#### Alternativas y trade-offs
+
+- **Conservar lo actual**: no requiere cambios ni riesgo. Se puede considerar que todavia es manejable. El costo es que cada nuevo endpoint copia el bloque, y hay mucha repeticion de codigo. Ante un cambio en el manejo de los mismos, habria que modificar cada codigo copiado
+
+- **Pasar el error con `next(error)` desde el controller**: en vez de resolver el error en cada `catch`, el controller se lo pasa al `errorHandler` global con `next(error)`, y es ese el unico lugar que decide que responder. El trade-off es que cada metodo tiene que recibir `next` por parametro, lo cual nos parece minimo.
+
+#### Decision:
+
+**_Pasar el error con `next(error)` desde cada controller_**: nos parecio la opcion mas simple y directa. No agregamos ninguna clase ni modulo nuevo, el cambio en cada metodo es chico.
+
+Lo vamos a hacer en pasos chicos:
+
+- Un controller por vez: agregar `next` como parametro y reemplazar el contenido del `catch` por `return next(error)`.
+
+Los casos de "no encontrado" (404) no los tratamos como error, siguen resolviendose dentro del controller.
+
+#### Seguridad
+
+El proyecto todavia no tiene tests, asi que no tenemos esa red de seguridad. Para compensarlo, antes y despues de cada cambio probamos con Postman las mismas peticiones y comparamos **status y body**: listar, detalle existente, detalle inexistente (404), crear algo valido, crear algo invalido (400). Tambien forzamos un error en el repository para confirmar que llega al `errorHandler`.
+
+#### Evidencia y trade-offs
+
+- **Codigo:** [EspectadorController](../src/controllers/EspectadorController.ts), [TicketController](../src/controllers/TicketController.ts), [EventoController](../src/controllers/EventoController.ts), [errorHandler](../src/middlewares/errorHandler.ts) y [app.ts](../src/app.ts) (donde se registra).
+- **Beneficios:** un solo lugar decide como se responde un error, los controllers quedan mas cortos y con una sola responsabilidad (SRP).
+- **Costos:** Hay que acordarse de pasar `next` en los metodos nuevos, y las respuestas 500 ahora devuelven un mensaje generico (`Error interno del servidor`) en vez de uno por metodo (por ejemplo `Error al buscar los eventos`). Aceptamos ese cambio por simplicidad.
