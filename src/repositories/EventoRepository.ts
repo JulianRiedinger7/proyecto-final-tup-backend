@@ -1,11 +1,23 @@
 import type { Eventos, EventosSortOrder } from '../models/Eventos';
-import type { EventoFilterParams } from '../schemas/evento.schema';
+import type { EventoFilterParams, NewEvento, PatchEvento } from '../schemas/evento.schema';
 
 interface IEventoRepository {
   findAll(params?: EventoFilterParams): Promise<{ items: Eventos[]; total: number }>;
+  findById(id: number): Promise<Eventos | undefined>;
+  create(evento: NewEvento): Promise<Eventos>;
+  replace(id: number, evento: NewEvento): Promise<Eventos | undefined>;
+  update(id: number, evento: PatchEvento): Promise<Eventos | undefined>;
+  delete(id: number): Promise<Eventos | undefined>;
 }
 
 const DEFAULT_LIMIT = 10;
+
+export class EventoCapacityError extends Error {
+  constructor() {
+    super('El cupo de reservas web no puede superar el aforo máximo');
+    this.name = 'EventoCapacityError';
+  }
+}
 
 export class EventoRepository implements IEventoRepository {
   private eventos: Eventos[] = [
@@ -78,6 +90,46 @@ export class EventoRepository implements IEventoRepository {
     };
   }
 
+  async findById(id: number): Promise<Eventos | undefined> {
+    return this.eventos.find((evento) => evento.id === id);
+  }
+
+  async create(evento: NewEvento): Promise<Eventos> {
+    this.ensureValidCapacity(evento);
+    const nextId = this.eventos.reduce((maxId, current) => Math.max(maxId, current.id), 0) + 1;
+    const nuevoEvento: Eventos = { id: nextId, ...evento };
+    this.eventos.push(nuevoEvento);
+    return nuevoEvento;
+  }
+
+  async replace(id: number, evento: NewEvento): Promise<Eventos | undefined> {
+    const index = this.eventos.findIndex((current) => current.id === id);
+    if (index === -1) return undefined;
+
+    this.ensureValidCapacity(evento);
+    const eventoActualizado: Eventos = { id, ...evento };
+    this.eventos[index] = eventoActualizado;
+    return eventoActualizado;
+  }
+
+  async update(id: number, cambios: PatchEvento): Promise<Eventos | undefined> {
+    const index = this.eventos.findIndex((current) => current.id === id);
+    if (index === -1) return undefined;
+
+    const eventoActualizado = { ...this.eventos[index], ...cambios };
+    this.ensureValidCapacity(eventoActualizado);
+    this.eventos[index] = eventoActualizado;
+    return eventoActualizado;
+  }
+
+  async delete(id: number): Promise<Eventos | undefined> {
+    const evento = await this.findById(id);
+    if (evento) {
+      this.eventos = this.eventos.filter((current) => current.id !== id);
+    }
+    return evento;
+  }
+
   private filterEventos(eventos: Eventos[], titulo?: string, lugar?: string): Eventos[] {
     const tituloTerm = titulo?.toLocaleLowerCase();
     const lugarTerm = lugar?.toLocaleLowerCase();
@@ -95,5 +147,11 @@ export class EventoRepository implements IEventoRepository {
       (eventoA, eventoB) =>
         (Date.parse(eventoA.fechaHora) - Date.parse(eventoB.fechaHora)) * direction,
     );
+  }
+
+  private ensureValidCapacity(evento: Pick<Eventos, 'aforoMaximo' | 'cupoReservasWeb'>): void {
+    if (evento.cupoReservasWeb > evento.aforoMaximo) {
+      throw new EventoCapacityError();
+    }
   }
 }
