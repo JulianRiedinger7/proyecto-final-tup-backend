@@ -8,7 +8,7 @@ A continuacion explicaremos nuestro analisis y distintas decisiones acerca de Pa
 
 #### Diagnostico:
 
-Actualmente existe una cadena de dependencia a la hora de instanciar los objetos, donde `Route` debe conocer como se instancia el `Controller`, y este, como se instancia el `Repository`.
+Actualmente existe una cadena de dependencia a la hora de instanciar los objetos, donde `Route` debe conocer como se instancia el `Controller`, y a su vez, como se instancia el `Repository`.
 
 Si agregamos capas extra en un futuro, como `services` para logica de negocios, seria necesario modificar en toda la cadena para su correcta incorporacion, generando mucho acoplamiento.
 
@@ -43,7 +43,7 @@ Analizando las relaciones y comunicaciones entre los distintos módulos del sist
 
 - **_Decorator_** : Pensamos en este patrón para extender el comportamiento de algún módulo envolviéndolo (por ejemplo, para agregar un logger, métricas o reintentos). Sin embargo, actualmente nuestros módulos no necesitan agregar responsabilidades adicionales sobre las clases base. Implementarlo ahora solo haría más complejo el seguimiento del flujo de ejecución del código.
 
-- **_Facade_** : Al evaluarlo nos generó una duda inicial por su similitud con lo que resolvimos con `ControllerFactory`, ya que tambien buscamos abstraer la complejidad para las rutas. Sin embargo, entendemos que la Factory resuelve la creación (mas adecuado para este caso), mientras que Facade abstrae operaciones de negocio complejas de un modulo. Actualmente al no tener ningun servicio complejo compuesto por múltiples pasos, agregar una Facade sería crear un envoltorio vacío.
+- **_Facade_** : Al evaluarlo nos generó una duda inicial por su similitud con lo que resolvimos con `ControllerFactory`, ya que tambien buscamos abstraer la complejidad para las rutas. Sin embargo, entendemos que la Factory resuelve la creación (mas adecuado para este caso), mientras que Facade abstrae operaciones de negocio complejas de un modulo. Actualmente al no tener ningun servicio complejo compuesto por múltiples pasos, creemos que agregar una Facade no nos brinda ningun beneficio real.
 
 #### Decision:
 
@@ -81,7 +81,6 @@ Al analizar el backend de **CircuitoVivo** consideramos que el sistema funciona 
 
 1. Los controllers repiten el mismo manejo de errores en cada metodo.
 2. Las rutas y los controllers conocen como se instancian sus dependencias (mostrado en la Clase 4).
-3. Existe una regla de negocio dentro de un repository (ver Code Smells).
 
 #### Analisis:
 
@@ -106,7 +105,7 @@ Al analizar el backend de **CircuitoVivo** consideramos que el sistema funciona 
 
 #### Codigo analizado
 
-Los tres controllers ([TicketController](../src/controllers/EspectadorController.ts), [EspectadorController](../src/controllers/EspectadorController.ts), [EventoController](../src/config/EventoController.ts)). Y [errorHandler](../src/middlewares/errorHandler.ts) global.
+Los tres controllers ([TicketController](../src/controllers/TicketController.ts), [EspectadorController](../src/controllers/EspectadorController.ts), [EventoController](../src/config/EventoController.ts)). Y [errorHandler](../src/middlewares/errorHandler.ts) global.
 
 #### Evidencia (code smell)
 
