@@ -23,7 +23,6 @@ export type TicketIdParams = z.infer<typeof ticketIdParamsSchema>;
 export const newTicketSchema = z.object({
   espectadorId: z.coerce.number().int().positive(),
   eventoId: z.coerce.number().int().positive(),
-  precioUnitario: z.coerce.number().positive(),
   estado: z.enum(TICKET_ESTADOS),
 });
 
