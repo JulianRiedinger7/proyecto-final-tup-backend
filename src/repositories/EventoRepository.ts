@@ -1,15 +1,7 @@
 import initialEventos from '../../data/eventos.json';
 import type { Eventos, EventosSortOrder } from '../models/Eventos';
 import type { EventoFilterParams, NewEvento, PatchEvento } from '../schemas/evento.schema';
-
-interface IEventoRepository {
-  findAll(params?: EventoFilterParams): Promise<{ items: Eventos[]; total: number }>;
-  findById(id: number): Promise<Eventos | undefined>;
-  create(evento: NewEvento): Promise<Eventos>;
-  replace(id: number, evento: NewEvento): Promise<Eventos | undefined>;
-  update(id: number, evento: PatchEvento): Promise<Eventos | undefined>;
-  delete(id: number): Promise<Eventos | undefined>;
-}
+import type { IEventoRepository } from './interfaces/IEventoRepository';
 
 const DEFAULT_LIMIT = 10;
 
