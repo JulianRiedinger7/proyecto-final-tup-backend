@@ -9,14 +9,7 @@ import type {
   NewEspectador,
   PatchEspectador,
 } from '../schemas/espectador.schema';
-
-interface IEspectadorRepository {
-  findAll(params?: EspectadoresFilterParams): Promise<{ items: Espectadores[]; total: number }>;
-  findByID(id: number): Promise<Espectadores | undefined>;
-  create(params: NewEspectador): Promise<Espectadores>;
-  update(id: number, cambiosEspectador: PatchEspectador): Promise<Espectadores | undefined>;
-  delete(id: number): Promise<Espectadores | undefined>;
-}
+import type { IEspectadorRepository } from './interfaces/IEspectadorRepository';
 
 const DEFAULT_LIMIT = 10;
 
