@@ -13,6 +13,8 @@ interface IEventoRepository {
 const DEFAULT_LIMIT = 10;
 
 export class EventoCapacityError extends Error {
+  readonly statusCode = 400;
+
   constructor() {
     super('El cupo de reservas web no puede superar el aforo máximo');
     this.name = 'EventoCapacityError';
