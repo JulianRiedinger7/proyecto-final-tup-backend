@@ -1,38 +1,11 @@
+import { TicketDependencyNotFoundError, TicketEventStartedError } from '../errors/TicketErrors';
 import type { Ticket } from '../models/Ticket';
 import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../repositories/interfaces/IEventoRepository';
 import type { ITicketRepository } from '../repositories/interfaces/ITicketRepository';
 import type { NewTicket, PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
+import { getArgentinaDate, hasDateStarted } from '../utils/date';
 import type { ITicketService } from './interfaces/ITicketService';
-
-const argentinaDateFormatter = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'America/Argentina/Buenos_Aires',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-function getArgentinaDate(date: Date): string {
-  return argentinaDateFormatter.format(date);
-}
-
-export class TicketDependencyNotFoundError extends Error {
-  readonly statusCode = 404;
-
-  constructor(message: string) {
-    super(message);
-    this.name = 'TicketDependencyNotFoundError';
-  }
-}
-
-export class TicketEventStartedError extends Error {
-  readonly statusCode = 409;
-
-  constructor() {
-    super('No se pueden emitir tickets para un evento que ya comenzó');
-    this.name = 'TicketEventStartedError';
-  }
-}
 
 export class TicketService implements ITicketService {
   constructor(
@@ -60,7 +33,7 @@ export class TicketService implements ITicketService {
 
     const fechaHoraEvento = new Date(evento.fechaHora);
     const ahora = new Date();
-    if (ahora >= fechaHoraEvento) {
+    if (hasDateStarted(fechaHoraEvento, ahora)) {
       throw new TicketEventStartedError();
     }
 
