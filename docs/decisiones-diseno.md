@@ -97,7 +97,7 @@ Al analizar el backend de **CircuitoVivo** consideramos que el sistema funciona 
 
 - **_Principios SOLID_**:
   - **_SRP_**: Consideramos que en general lo cumplimos (rutas definen los endpoints, controllers conocen sobre HTTP, repositories acceden a datos). Sin embargo consideramos una excepcion: los controllers tambien deciden **como se maneja y se loguea cada error**.
-  - **_DIP_**: Actualmente las rutas instancian directamente los controllers y el repository. La Factory (`ControllerFactory`) permitiria que el nivel alto dependa de abstracciones. Por otro lado, los controllers dependen de la clase concreta del repository (`repo: EventoRepository`), cuando deberian depender del contrato de las interfaces (`IEventoRepository`, etc.).
+  - **_DIP_**: Los controllers dependen de contratos (`IEventoRepository`, `IEspectadorRepository` e `ITicketRepository`) definidos independientemente de las implementaciones, y no de las clases concretas de los repositories. Las rutas todavía instancian los controllers y repositories concretos; centralizar esa construcción en una Factory queda como una mejora pendiente.
   - **_ISP_**: Consideramos cumplirlo al declarar interfaces (`ITicketRepository`, `IEspectadorRepository`) pequeñas y bien definidas, siendo correctamente cumplidos por las clases.
   - **_OCP, LSP_**: por ahora no encontramos evidencia real comparable en nuestro codigo.
 
