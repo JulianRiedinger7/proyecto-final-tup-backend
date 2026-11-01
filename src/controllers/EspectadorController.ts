@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { EspectadorRepository } from '../repositories/EspectadoresRepository';
 import type { EspectadoresFilterParams } from '../schemas/espectador.schema';
 import { errorResponse, successResponse } from '../utils/response';
@@ -6,18 +6,25 @@ import { errorResponse, successResponse } from '../utils/response';
 export class EspectadorController {
   constructor(private readonly repo: EspectadorRepository) {}
 
-  findAll = async (req: Request, res: Response): Promise<Response> => {
+  findAll = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const filters = req.query as unknown as EspectadoresFilterParams;
       const espectadores = await this.repo.findAll(filters);
       return successResponse(res, 'Espectadores encontrados', 200, espectadores);
     } catch (error) {
-      console.error(`Error al buscar los espectadores: ${error}`);
-      return errorResponse(res, 'Error al buscar los espectadores', 500);
+      next(error);
     }
   };
 
-  findByID = async (req: Request, res: Response): Promise<Response> => {
+  findByID = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const id = Number(req.params.id);
       const espectadores = await this.repo.findByID(id);
@@ -26,23 +33,29 @@ export class EspectadorController {
       }
       return successResponse(res, 'Espectador encontrado', 200, espectadores);
     } catch (error) {
-      console.error('No se encontró al espectador', error);
-      return errorResponse(res, 'Error al buscar a este espectaddor', 500);
+      next(error);
     }
   };
 
-  create = async (req: Request, res: Response): Promise<Response> => {
+  create = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const EspectadorData = req.body;
       const NuevoEspectador = await this.repo.create(EspectadorData);
       return successResponse(res, 'Espectador creado', 201, NuevoEspectador);
     } catch (error) {
-      console.error('Error al crear el espectador', error);
-      return errorResponse(res, 'Error al crear el espectador', 500);
+      next(error);
     }
   };
 
-  update = async (req: Request, res: Response): Promise<Response> => {
+  update = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const id = Number(req.params.id);
       const espectadorData = req.body;
@@ -52,12 +65,15 @@ export class EspectadorController {
       }
       return successResponse(res, 'Espectador actualizado', 200, espectador);
     } catch (error) {
-      console.error(`Error al actualizar el espectador: ${error}`);
-      return errorResponse(res, 'Error al actualizar el espectador', 404);
+      next(error);
     }
   };
 
-  delete = async (req: Request, res: Response): Promise<Response> => {
+  delete = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const id = Number(req.params.id);
       const espectador = await this.repo.delete(id);
@@ -66,8 +82,7 @@ export class EspectadorController {
       }
       return successResponse(res, 'Espectador eliminado', 200, espectador);
     } catch (error) {
-      console.error(`Error al borrar el espectador: ${error}`);
-      return errorResponse(res, 'Error al borrar el espectador', 404);
+      next(error);
     }
   };
 }
