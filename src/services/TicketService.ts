@@ -13,18 +13,18 @@ export class TicketService implements ITicketService {
   ) {}
 
   listTickets(params?: TicketFilterParams): Promise<{ items: Ticket[]; total: number }> {
-    throw new Error('Method not implemented.');
+    return this.tickets.findAll(params);
   }
   getTicket(id: number): Promise<Ticket | undefined> {
-    throw new Error('Method not implemented.');
+    return this.tickets.findById(id);
   }
   createTicket(ticket: NewTicket): Promise<Ticket> {
-    throw new Error('Method not implemented.');
+    return this.tickets.create(ticket);
   }
   updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
-    throw new Error('Method not implemented.');
+    return this.tickets.update(id, ticket);
   }
   deleteTicket(id: number): Promise<Ticket | undefined> {
-    throw new Error('Method not implemented.');
+    return this.tickets.delete(id);
   }
 }

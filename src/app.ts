@@ -3,10 +3,15 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
+import { TicketController } from './controllers/TicketController';
 import { errorHandler } from './middlewares/errorHandler';
+import { EspectadorRepository } from './repositories/EspectadoresRepository';
+import { EventoRepository } from './repositories/EventoRepository';
+import { TicketRepository } from './repositories/TicketRepository';
 import { EspectadorRoutes } from './routes/EspectadorRoutes';
 import { EventoRoutes } from './routes/EventoRoutes';
 import { TicketRoutes } from './routes/TicketRoutes';
+import { TicketService } from './services/TicketService';
 import { successResponse } from './utils/response';
 
 export class App {
@@ -30,8 +35,17 @@ export class App {
   }
 
   private setupRoutes(): void {
+    const eventoRepo = new EventoRepository();
+    const espectadorRepo = new EspectadorRepository();
+    const ticketRepo = new TicketRepository();
+
+    const ticketService = new TicketService(ticketRepo, eventoRepo, espectadorRepo);
+
     this.instance.use('/api/v1/eventos', new EventoRoutes().getRoutes());
-    this.instance.use('/api/v1/tickets', new TicketRoutes().getRoutes());
+    this.instance.use(
+      '/api/v1/tickets',
+      new TicketRoutes(new TicketController(ticketService)).getRoutes(),
+    );
     this.instance.use('/api/v1/espectadores', new EspectadorRoutes().getRoutes());
     this.instance.get('/api/v1/health', (_req, res) => successResponse(res, 'Status OK', 200, {}));
 
