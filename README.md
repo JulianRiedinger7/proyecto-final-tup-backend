@@ -1,8 +1,9 @@
 # Sistema de Gestión de Escena Musical Local — Backend
 
-> Repositorio **backend** del proyecto final de carrera: un sistema de gestión para la escena musical local, incluyendo bandas, eventos y espectadores/publico general. Este backend expone una API REST para ser consumida por un frontend.
+> Repositorio **backend** del proyecto final de carrera: un sistema de gestión para la escena musical local, incluyendo bandas, eventos y espectadores/publico general. Este backend expone una API REST para ser consumida por un frontend: [Frontend Repo](https://github.com/JulianRiedinger7/proyecto-final-tup-frontend)
 
 ## Diagrama Entidad-Relacion Inicial
+
 ![Diagrama ER](./assets/diagrama-er.png)
 
 ## Integrantes
@@ -69,17 +70,17 @@ pnpm lint:fix   # aplica fixes seguros + formato (todo el repo)
 pnpm format:check # chequeo de formato estilo CI (biome ci)
 ```
 
-> Estilo de código: **Biome 2.x** (`biome.json`, comillas dobles, 2 espacios, LF, imports ordenados).
+> Estilo de código: **Biome 2.x**.
 > El hook `pre-commit` de **Husky** corre `biome check --staged` y bloquea el commit si hay errores.
 > Si el hook te frena, corre `pnpm lint:fix`, revisa el diff y commitea de nuevo.
 > Extensión recomendada VSCode: `biomejs.biome` (ver `.vscode/extensions.json`).
-> Cuando el proyecto crezca y el hook se vuelva lento, el siguiente paso es agregar `lint-staged`.
 
 La API queda en `http://localhost:3000` (o el `PORT` definido en tu `.env`).
 
 ## Estado Actual del Proyecto
 
-- Taller I (actual):
-  - Constitucion del equipo y repo inicial.
-  - Entorno de desarrollo reproducible probado por todo el equipo.
-  - API base con endpoint de prueba utilizando Express.
+- [x] Modelo de datos inicial (ER) definido y documentado.
+- [x] CRUD de Tickes, Eventos y Espectadores implementado utilizando una arquitectura en capas.
+- [x] Conexion a datos locales utilizando archivo JSON como "base de datos" (simulando persistencia).
+- [ ] Implementacion de Tests unitarios y de integracion para reglas de negocio principales
+- [ ] Documentacion de la API con Postman
