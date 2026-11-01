@@ -5,6 +5,15 @@ import type { ITicketRepository } from '../repositories/interfaces/ITicketReposi
 import type { NewTicket, PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
 import type { ITicketService } from './interfaces/ITicketService';
 
+export class TicketDependencyNotFoundError extends Error {
+  readonly statusCode = 404;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'TicketDependencyNotFoundError';
+  }
+}
+
 export class TicketService implements ITicketService {
   constructor(
     private readonly tickets: ITicketRepository,
@@ -18,7 +27,17 @@ export class TicketService implements ITicketService {
   getTicket(id: number): Promise<Ticket | undefined> {
     return this.tickets.findById(id);
   }
-  createTicket(ticket: NewTicket): Promise<Ticket> {
+  async createTicket(ticket: NewTicket): Promise<Ticket> {
+    const evento = await this.eventos.findById(ticket.eventoId);
+    if (!evento) {
+      throw new TicketDependencyNotFoundError('Evento no encontrado');
+    }
+
+    const espectador = await this.espectadores.findByID(ticket.espectadorId);
+    if (!espectador?.isActive) {
+      throw new TicketDependencyNotFoundError('Espectador no encontrado o inactivo');
+    }
+
     return this.tickets.create(ticket);
   }
   updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
