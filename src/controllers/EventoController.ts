@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { EventoRepository } from '../repositories/EventoRepository';
+import type { IEventoRepository } from '../repositories/interfaces/IEventoRepository';
 import type {
   EventoFilterParams,
   EventoIdParams,
@@ -9,7 +9,7 @@ import type {
 import { errorResponse, successResponse } from '../utils/response';
 
 export class EventoController {
-  constructor(private readonly repo: EventoRepository) {}
+  constructor(private readonly repo: IEventoRepository) {}
 
   findAll = async (
     req: Request,

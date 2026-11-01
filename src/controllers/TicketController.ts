@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { TicketRepository } from '../repositories/TicketRepository';
+import type { ITicketRepository } from '../repositories/interfaces/ITicketRepository';
 import type { TicketFilterParams, TicketIdParams } from '../schemas/ticket.schema';
 import { errorResponse, successResponse } from '../utils/response';
 
 export class TicketController {
-  constructor(private readonly repo: TicketRepository) {}
+  constructor(private readonly repo: ITicketRepository) {}
 
   findAll = async (
     req: Request,

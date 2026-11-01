@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { EspectadorRepository } from '../repositories/EspectadoresRepository';
+import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
 import type { EspectadoresFilterParams } from '../schemas/espectador.schema';
 import { errorResponse, successResponse } from '../utils/response';
 
 export class EspectadorController {
-  constructor(private readonly repo: EspectadorRepository) {}
+  constructor(private readonly repo: IEspectadorRepository) {}
 
   findAll = async (
     req: Request,
