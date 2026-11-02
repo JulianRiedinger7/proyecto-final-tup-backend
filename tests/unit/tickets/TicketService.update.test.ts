@@ -140,4 +140,15 @@ describe('Servicio de tickets: actualización', () => {
 
     expect(repositorioTickets.update).not.toHaveBeenCalled();
   });
+
+  it('si no se encuentra el ticket, devuelve undefined', async () => {
+    vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(undefined);
+
+    const resultado = await servicio.updateTicket(999, {
+      estado: 'CONFIRMADO',
+    });
+
+    expect(resultado).toBeUndefined();
+    expect(repositorioTickets.update).not.toHaveBeenCalled();
+  });
 });
