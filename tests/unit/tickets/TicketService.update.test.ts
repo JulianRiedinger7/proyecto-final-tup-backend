@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Ticket } from '../../../src/models/Ticket';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../../../src/repositories/interfaces/IEventoRepository';
@@ -53,6 +53,10 @@ describe('Servicio de tickets: actualización', () => {
     servicio = new TicketService(repositorioTickets, repositorioEventos, repositorioEspectadores);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('confirma un ticket reservado', async () => {
     const resultado = await servicio.updateTicket(ticketReservado.id, {
       estado: 'CONFIRMADO',
@@ -62,5 +66,42 @@ describe('Servicio de tickets: actualización', () => {
       estado: 'CONFIRMADO',
     });
     expect(resultado).toEqual(ticketConfirmado);
+  });
+
+  it('cancela un ticket reservado', async () => {
+    await servicio.updateTicket(ticketReservado.id, {
+      estado: 'CANCELADO',
+    });
+
+    expect(repositorioTickets.update).toHaveBeenCalledWith(ticketReservado.id, {
+      estado: 'CANCELADO',
+    });
+  });
+
+  it('marca como utilizado un ticket confirmado y registra la fecha de validación', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-10-10T20:00:00.000Z'));
+    vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(ticketConfirmado);
+
+    await servicio.updateTicket(ticketConfirmado.id, {
+      estado: 'UTILIZADO',
+    });
+
+    expect(repositorioTickets.update).toHaveBeenCalledWith(ticketConfirmado.id, {
+      estado: 'UTILIZADO',
+      fechaValidacionPuerta: '2030-10-10T20:00:00.000Z',
+    });
+  });
+
+  it('cancela un ticket confirmado', async () => {
+    vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(ticketConfirmado);
+
+    await servicio.updateTicket(ticketConfirmado.id, {
+      estado: 'CANCELADO',
+    });
+
+    expect(repositorioTickets.update).toHaveBeenCalledWith(ticketConfirmado.id, {
+      estado: 'CANCELADO',
+    });
   });
 });
