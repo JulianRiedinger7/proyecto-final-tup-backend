@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../../src/app';
+import type { Ticket } from '../../src/models/Ticket';
 
 const eventoDePrueba = {
   titulo: 'Evento de integración',
@@ -64,6 +65,28 @@ describe('Rutas de tickets', () => {
           estado: 'RESERVADO',
           fechaValidacionPuerta: null,
         },
+      });
+    });
+  });
+
+  describe('GET /api/v1/tickets/:id', () => {
+    it('obtiene por ID un ticket creado previamente', async () => {
+      const respuestaCreacion = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId, espectadorId });
+      const ticketCreado = respuestaCreacion.body.data as Ticket;
+
+      expect(respuestaCreacion.status).toBe(201);
+
+      const respuestaConsulta = await request(app.instance).get(
+        `/api/v1/tickets/${ticketCreado.id}`,
+      );
+
+      expect(respuestaConsulta.status).toBe(200);
+      expect(respuestaConsulta.body).toEqual({
+        msg: 'Ticket encontrado',
+        code: 200,
+        data: ticketCreado,
       });
     });
   });
