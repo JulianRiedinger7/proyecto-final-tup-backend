@@ -2,14 +2,22 @@ import {
   TicketCapacityExceededError,
   TicketDependencyNotFoundError,
   TicketEventStartedError,
+  TicketInvalidTransitionError,
 } from '../errors/TicketErrors';
-import type { Ticket } from '../models/Ticket';
+import type { Ticket, TicketEstado } from '../models/Ticket';
 import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../repositories/interfaces/IEventoRepository';
 import type { ITicketRepository } from '../repositories/interfaces/ITicketRepository';
 import type { NewTicket, PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
 import { getArgentinaDate, hasDateStarted } from '../utils/date';
 import type { ITicketService } from './interfaces/ITicketService';
+
+const validTicketTransitions: Record<TicketEstado, readonly TicketEstado[]> = {
+  RESERVADO: ['CONFIRMADO', 'CANCELADO'],
+  CONFIRMADO: ['UTILIZADO', 'CANCELADO'],
+  UTILIZADO: [],
+  CANCELADO: [],
+};
 
 export class TicketService implements ITicketService {
   constructor(
@@ -59,12 +67,8 @@ export class TicketService implements ITicketService {
       return undefined;
     }
 
-    if (existingTicket.estado === 'CANCELADO' && ticket.estado !== 'CANCELADO') {
-      const evento = await this.eventos.findById(existingTicket.eventoId);
-      if (!evento) {
-        throw new TicketDependencyNotFoundError('Evento no encontrado');
-      }
-      await this.ensureEventoHasCapacity(evento.id, evento.cupoReservasWeb);
+    if (!validTicketTransitions[existingTicket.estado].includes(ticket.estado)) {
+      throw new TicketInvalidTransitionError(existingTicket.estado, ticket.estado);
     }
 
     return this.tickets.update(id, ticket);

@@ -24,3 +24,12 @@ export class TicketCapacityExceededError extends Error {
     this.name = 'TicketCapacityExceededError';
   }
 }
+
+export class TicketInvalidTransitionError extends Error {
+  readonly statusCode = 409;
+
+  constructor(currentState: string, requestedState: string) {
+    super(`No se puede cambiar el estado del ticket de ${currentState} a ${requestedState}`);
+    this.name = 'TicketInvalidTransitionError';
+  }
+}
