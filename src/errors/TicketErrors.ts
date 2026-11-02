@@ -15,3 +15,12 @@ export class TicketEventStartedError extends Error {
     this.name = 'TicketEventStartedError';
   }
 }
+
+export class TicketCapacityExceededError extends Error {
+  readonly statusCode = 409;
+
+  constructor() {
+    super('Se alcanzó el cupo de reservas web para este evento');
+    this.name = 'TicketCapacityExceededError';
+  }
+}

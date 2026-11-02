@@ -1,4 +1,8 @@
-import { TicketDependencyNotFoundError, TicketEventStartedError } from '../errors/TicketErrors';
+import {
+  TicketCapacityExceededError,
+  TicketDependencyNotFoundError,
+  TicketEventStartedError,
+} from '../errors/TicketErrors';
 import type { Ticket } from '../models/Ticket';
 import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../repositories/interfaces/IEventoRepository';
@@ -41,16 +45,38 @@ export class TicketService implements ITicketService {
     const fechaActual = getArgentinaDate(ahora);
     const precioUnitario = fechaActual < fechaEvento ? evento.precioPreventa : evento.precioPuerta;
 
+    await this.ensureEventoHasCapacity(evento.id, evento.cupoReservasWeb);
+
     return this.tickets.create({
       ...ticket,
       precioUnitario,
       estado: 'RESERVADO',
     });
   }
-  updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
+  async updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
+    const existingTicket = await this.tickets.findById(id);
+    if (!existingTicket) {
+      return undefined;
+    }
+
+    if (existingTicket.estado === 'CANCELADO' && ticket.estado !== 'CANCELADO') {
+      const evento = await this.eventos.findById(existingTicket.eventoId);
+      if (!evento) {
+        throw new TicketDependencyNotFoundError('Evento no encontrado');
+      }
+      await this.ensureEventoHasCapacity(evento.id, evento.cupoReservasWeb);
+    }
+
     return this.tickets.update(id, ticket);
   }
   deleteTicket(id: number): Promise<Ticket | undefined> {
     return this.tickets.delete(id);
+  }
+
+  private async ensureEventoHasCapacity(eventoId: number, cupoReservasWeb: number): Promise<void> {
+    const ticketCount = await this.tickets.countNonCancelledByEvento(eventoId);
+    if (ticketCount >= cupoReservasWeb) {
+      throw new TicketCapacityExceededError();
+    }
   }
 }

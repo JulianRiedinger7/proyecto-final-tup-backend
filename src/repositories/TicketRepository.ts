@@ -38,6 +38,12 @@ export class TicketRepository implements ITicketRepository {
     return Promise.resolve(this.tickets.find((ticket) => ticket.id === id));
   }
 
+  async countNonCancelledByEvento(eventoId: number): Promise<number> {
+    return this.tickets.filter(
+      (ticket) => ticket.eventoId === eventoId && ticket.estado !== 'CANCELADO',
+    ).length;
+  }
+
   async create(ticket: TicketToCreate): Promise<Ticket> {
     const newTicket: Ticket = {
       id: this.tickets.length + 1,
