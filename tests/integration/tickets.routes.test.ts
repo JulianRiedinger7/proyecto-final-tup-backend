@@ -99,5 +99,15 @@ describe('Rutas de tickets', () => {
         code: 404,
       });
     });
+
+    it('devuelve 400 cuando el ID del ticket no es válido', async () => {
+      const respuesta = await request(app.instance).get('/api/v1/tickets/abc');
+
+      expect(respuesta.status).toBe(400);
+      expect(respuesta.body).toMatchObject({
+        code: 400,
+        msg: expect.stringContaining('Datos inválidos'),
+      });
+    });
   });
 });
