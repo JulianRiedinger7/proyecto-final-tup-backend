@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TicketEventStartedError } from '../../../src/errors/TicketErrors';
+import {
+  TicketDependencyNotFoundError,
+  TicketEventStartedError,
+} from '../../../src/errors/TicketErrors';
 import type { Espectadores } from '../../../src/models/Espectadores';
 import type { Eventos } from '../../../src/models/Eventos';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
@@ -33,6 +36,8 @@ const espectador: Espectadores = {
 describe('Servicio de tickets: creación', () => {
   let servicio: TicketService;
   let repositorioTickets: ITicketRepository;
+  let repositorioEventos: IEventoRepository;
+  let repositorioEspectadores: IEspectadorRepository;
 
   beforeEach(() => {
     repositorioTickets = {
@@ -49,7 +54,7 @@ describe('Servicio de tickets: creación', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const repositorioEventos: IEventoRepository = {
+    repositorioEventos = {
       findAll: vi.fn(),
       findById: vi.fn().mockResolvedValue(evento),
       create: vi.fn(),
@@ -57,7 +62,7 @@ describe('Servicio de tickets: creación', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const repositorioEspectadores: IEspectadorRepository = {
+    repositorioEspectadores = {
       findAll: vi.fn(),
       findByID: vi.fn().mockResolvedValue(espectador),
       create: vi.fn(),
@@ -116,6 +121,48 @@ describe('Servicio de tickets: creación', () => {
         espectadorId: espectador.id,
       }),
     ).rejects.toBeInstanceOf(TicketEventStartedError);
+
+    expect(repositorioTickets.create).not.toHaveBeenCalled();
+  });
+
+  it('rechaza la creación de un ticket cuando el evento no existe', async () => {
+    vi.mocked(repositorioEventos.findById).mockResolvedValueOnce(undefined);
+
+    await expect(
+      servicio.createTicket({
+        eventoId: evento.id,
+        espectadorId: espectador.id,
+      }),
+    ).rejects.toBeInstanceOf(TicketDependencyNotFoundError);
+
+    expect(repositorioTickets.create).not.toHaveBeenCalled();
+  });
+
+  it('rechaza la creación de un ticket cuando el espectador no existe', async () => {
+    vi.mocked(repositorioEspectadores.findByID).mockResolvedValueOnce(undefined);
+
+    await expect(
+      servicio.createTicket({
+        eventoId: evento.id,
+        espectadorId: espectador.id,
+      }),
+    ).rejects.toBeInstanceOf(TicketDependencyNotFoundError);
+
+    expect(repositorioTickets.create).not.toHaveBeenCalled();
+  });
+
+  it('rechaza la creación de un ticket cuando el espectador está inactivo', async () => {
+    vi.mocked(repositorioEspectadores.findByID).mockResolvedValueOnce({
+      ...espectador,
+      isActive: false,
+    });
+
+    await expect(
+      servicio.createTicket({
+        eventoId: evento.id,
+        espectadorId: espectador.id,
+      }),
+    ).rejects.toBeInstanceOf(TicketDependencyNotFoundError);
 
     expect(repositorioTickets.create).not.toHaveBeenCalled();
   });
