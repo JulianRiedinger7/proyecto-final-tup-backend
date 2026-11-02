@@ -133,29 +133,61 @@ describe('Rutas de tickets', () => {
         msg: expect.stringContaining('Datos inválidos'),
       });
     });
+  });
 
-    describe('PATCH /api/v1/tickets/:id', () => {
-      it('confirma un ticket reservado', async () => {
-        const respuestaCreacion = await request(app.instance)
-          .post('/api/v1/tickets')
-          .send({ eventoId, espectadorId });
-        const ticketCreado = respuestaCreacion.body.data as Ticket;
+  describe('PATCH /api/v1/tickets/:id', () => {
+    it('confirma un ticket reservado', async () => {
+      const respuestaCreacion = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId, espectadorId });
+      const ticketCreado = respuestaCreacion.body.data as Ticket;
 
-        expect(respuestaCreacion.status).toBe(201);
+      expect(respuestaCreacion.status).toBe(201);
 
-        const respuestaActualizacion = await request(app.instance)
-          .patch(`/api/v1/tickets/${ticketCreado.id}`)
-          .send({ estado: 'CONFIRMADO' });
+      const respuestaActualizacion = await request(app.instance)
+        .patch(`/api/v1/tickets/${ticketCreado.id}`)
+        .send({ estado: 'CONFIRMADO' });
 
-        expect(respuestaActualizacion.status).toBe(200);
-        expect(respuestaActualizacion.body).toEqual({
-          msg: 'Ticket actualizado',
-          code: 200,
-          data: {
-            ...ticketCreado,
-            estado: 'CONFIRMADO',
-          },
-        });
+      expect(respuestaActualizacion.status).toBe(200);
+      expect(respuestaActualizacion.body).toEqual({
+        msg: 'Ticket actualizado',
+        code: 200,
+        data: {
+          ...ticketCreado,
+          estado: 'CONFIRMADO',
+        },
+      });
+    });
+  });
+
+  describe('DELETE /api/v1/tickets/:id', () => {
+    it('elimina un ticket existente', async () => {
+      const respuestaCreacion = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId, espectadorId });
+      const ticketCreado = respuestaCreacion.body.data as Ticket;
+
+      expect(respuestaCreacion.status).toBe(201);
+
+      const respuestaEliminacion = await request(app.instance).delete(
+        `/api/v1/tickets/${ticketCreado.id}`,
+      );
+
+      expect(respuestaEliminacion.status).toBe(200);
+      expect(respuestaEliminacion.body).toEqual({
+        msg: 'Ticket eliminado',
+        code: 200,
+        data: ticketCreado,
+      });
+
+      const respuestaConsulta = await request(app.instance).get(
+        `/api/v1/tickets/${ticketCreado.id}`,
+      );
+
+      expect(respuestaConsulta.status).toBe(404);
+      expect(respuestaConsulta.body).toEqual({
+        msg: 'Ticket no encontrado',
+        code: 404,
       });
     });
   });
