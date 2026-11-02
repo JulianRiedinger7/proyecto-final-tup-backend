@@ -20,7 +20,7 @@ export const ticketIdParamsSchema = z.object({
 
 export type TicketIdParams = z.infer<typeof ticketIdParamsSchema>;
 
-export const newTicketSchema = z.object({
+export const newTicketSchema = z.strictObject({
   espectadorId: z.coerce.number().int().positive(),
   eventoId: z.coerce.number().int().positive(),
 });
