@@ -1,6 +1,13 @@
 import initialTickets from '../../data/tickets.json';
-import type { Ticket, TicketEstado, TicketSortBy, TicketSortOrder } from '../models/Ticket';
-import type { NewTicket, PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
+import type {
+  Ticket,
+  TicketEstado,
+  TicketSortBy,
+  TicketSortOrder,
+  TicketToCreate,
+  TicketToUpdate,
+} from '../models/Ticket';
+import type { TicketFilterParams } from '../schemas/ticket.schema';
 import type { ITicketRepository } from './interfaces/ITicketRepository';
 
 export class TicketRepository implements ITicketRepository {
@@ -32,7 +39,13 @@ export class TicketRepository implements ITicketRepository {
     return Promise.resolve(this.tickets.find((ticket) => ticket.id === id));
   }
 
-  async create(ticket: NewTicket): Promise<Ticket> {
+  async countNonCancelledByEvento(eventoId: number): Promise<number> {
+    return this.tickets.filter(
+      (ticket) => ticket.eventoId === eventoId && ticket.estado !== 'CANCELADO',
+    ).length;
+  }
+
+  async create(ticket: TicketToCreate): Promise<Ticket> {
     const newTicket: Ticket = {
       id: this.tickets.length + 1,
       codigoQr: `CV-QR-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
@@ -44,7 +57,7 @@ export class TicketRepository implements ITicketRepository {
     return Promise.resolve(newTicket);
   }
 
-  async update(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
+  async update(id: number, ticket: TicketToUpdate): Promise<Ticket | undefined> {
     const existingTicketIndex = this.tickets.findIndex((t) => t.id === id);
     if (existingTicketIndex === -1) {
       return Promise.resolve(undefined);
