@@ -67,6 +67,30 @@ describe('Rutas de tickets', () => {
         },
       });
     });
+
+    it('devuelve 404 cuando el evento no existe', async () => {
+      const respuesta = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId: Number.MAX_SAFE_INTEGER, espectadorId });
+
+      expect(respuesta.status).toBe(404);
+      expect(respuesta.body).toEqual({
+        msg: 'Evento no encontrado',
+        code: 404,
+      });
+    });
+
+    it('devuelve 404 cuando el espectador no existe', async () => {
+      const respuesta = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId, espectadorId: Number.MAX_SAFE_INTEGER });
+
+      expect(respuesta.status).toBe(404);
+      expect(respuesta.body).toEqual({
+        msg: 'Espectador no encontrado o inactivo',
+        code: 404,
+      });
+    });
   });
 
   describe('GET /api/v1/tickets/:id', () => {
