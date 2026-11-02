@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { TicketEventStartedError } from '../../../src/errors/TicketErrors';
 import type { Espectadores } from '../../../src/models/Espectadores';
 import type { Eventos } from '../../../src/models/Eventos';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
@@ -103,5 +104,19 @@ describe('Servicio de tickets: creación', () => {
       precioUnitario: evento.precioPuerta,
       estado: 'RESERVADO',
     });
+  });
+
+  it('rechaza la creación de un ticket cuando el evento ya comenzó', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-10-10T20:01:00-03:00'));
+
+    await expect(
+      servicio.createTicket({
+        eventoId: evento.id,
+        espectadorId: espectador.id,
+      }),
+    ).rejects.toBeInstanceOf(TicketEventStartedError);
+
+    expect(repositorioTickets.create).not.toHaveBeenCalled();
   });
 });
