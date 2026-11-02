@@ -41,7 +41,11 @@ export class TicketService implements ITicketService {
     const fechaActual = getArgentinaDate(ahora);
     const precioUnitario = fechaActual < fechaEvento ? evento.precioPreventa : evento.precioPuerta;
 
-    return this.tickets.create({ ...ticket, precioUnitario });
+    return this.tickets.create({
+      ...ticket,
+      precioUnitario,
+      estado: 'RESERVADO',
+    });
   }
   updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
     return this.tickets.update(id, ticket);

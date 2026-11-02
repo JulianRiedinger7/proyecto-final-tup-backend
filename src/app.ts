@@ -3,6 +3,8 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
+import { EspectadorController } from './controllers/EspectadorController';
+import { EventoController } from './controllers/EventoController';
 import { TicketController } from './controllers/TicketController';
 import { errorHandler } from './middlewares/errorHandler';
 import { EspectadorRepository } from './repositories/EspectadoresRepository';
@@ -41,12 +43,18 @@ export class App {
 
     const ticketService = new TicketService(ticketRepo, eventoRepo, espectadorRepo);
 
-    this.instance.use('/api/v1/eventos', new EventoRoutes().getRoutes());
+    this.instance.use(
+      '/api/v1/eventos',
+      new EventoRoutes(new EventoController(eventoRepo)).getRoutes(),
+    );
     this.instance.use(
       '/api/v1/tickets',
       new TicketRoutes(new TicketController(ticketService)).getRoutes(),
     );
-    this.instance.use('/api/v1/espectadores', new EspectadorRoutes().getRoutes());
+    this.instance.use(
+      '/api/v1/espectadores',
+      new EspectadorRoutes(new EspectadorController(espectadorRepo)).getRoutes(),
+    );
     this.instance.get('/api/v1/health', (_req, res) => successResponse(res, 'Status OK', 200, {}));
 
     this.instance.use((_req, _res, next) => {
