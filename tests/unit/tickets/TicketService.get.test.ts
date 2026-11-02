@@ -54,4 +54,13 @@ describe('Servicio de tickets: consulta por ID', () => {
     expect(repositorioTickets.findById).toHaveBeenCalledWith(ticket.id);
     expect(resultado).toEqual(ticket);
   });
+
+  it('devuelve undefined cuando el ticket no existe', async () => {
+    vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(undefined);
+
+    const resultado = await servicio.getTicket(999);
+
+    expect(repositorioTickets.findById).toHaveBeenCalledWith(999);
+    expect(resultado).toBeUndefined();
+  });
 });
