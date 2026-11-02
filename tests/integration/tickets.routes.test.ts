@@ -89,5 +89,15 @@ describe('Rutas de tickets', () => {
         data: ticketCreado,
       });
     });
+
+    it('devuelve 404 cuando el ticket no existe', async () => {
+      const respuesta = await request(app.instance).get('/api/v1/tickets/999999');
+
+      expect(respuesta.status).toBe(404);
+      expect(respuesta.body).toEqual({
+        msg: 'Ticket no encontrado',
+        code: 404,
+      });
+    });
   });
 });
