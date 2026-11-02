@@ -54,4 +54,13 @@ describe('Servicio de tickets: eliminación', () => {
     expect(repositorioTickets.delete).toHaveBeenCalledWith(ticket.id);
     expect(resultado).toEqual(ticket);
   });
+
+  it('devuelve undefined cuando el ticket no existe', async () => {
+    vi.mocked(repositorioTickets.delete).mockResolvedValueOnce(undefined);
+
+    const resultado = await servicio.deleteTicket(999);
+
+    expect(repositorioTickets.delete).toHaveBeenCalledWith(999);
+    expect(resultado).toBeUndefined();
+  });
 });
