@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  TicketCapacityExceededError,
   TicketDependencyNotFoundError,
   TicketEventStartedError,
 } from '../../../src/errors/TicketErrors';
@@ -164,6 +165,22 @@ describe('Servicio de tickets: creación', () => {
       }),
     ).rejects.toBeInstanceOf(TicketDependencyNotFoundError);
 
+    expect(repositorioTickets.create).not.toHaveBeenCalled();
+  });
+
+  it('rechaza la creación de un ticket cuando se alcanza el cupo de reservas web', async () => {
+    vi.mocked(repositorioTickets.countNonCancelledByEvento).mockResolvedValueOnce(
+      evento.cupoReservasWeb,
+    );
+
+    await expect(
+      servicio.createTicket({
+        eventoId: evento.id,
+        espectadorId: espectador.id,
+      }),
+    ).rejects.toBeInstanceOf(TicketCapacityExceededError);
+
+    expect(repositorioTickets.countNonCancelledByEvento).toHaveBeenCalledWith(evento.id);
     expect(repositorioTickets.create).not.toHaveBeenCalled();
   });
 });
