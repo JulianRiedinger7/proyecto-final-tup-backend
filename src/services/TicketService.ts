@@ -71,7 +71,12 @@ export class TicketService implements ITicketService {
       throw new TicketInvalidTransitionError(existingTicket.estado, ticket.estado);
     }
 
-    return this.tickets.update(id, ticket);
+    const update =
+      ticket.estado === 'UTILIZADO'
+        ? { ...ticket, fechaValidacionPuerta: new Date().toISOString() }
+        : ticket;
+
+    return this.tickets.update(id, update);
   }
   deleteTicket(id: number): Promise<Ticket | undefined> {
     return this.tickets.delete(id);

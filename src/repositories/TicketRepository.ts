@@ -5,8 +5,9 @@ import type {
   TicketSortBy,
   TicketSortOrder,
   TicketToCreate,
+  TicketToUpdate,
 } from '../models/Ticket';
-import type { PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
+import type { TicketFilterParams } from '../schemas/ticket.schema';
 import type { ITicketRepository } from './interfaces/ITicketRepository';
 
 export class TicketRepository implements ITicketRepository {
@@ -56,7 +57,7 @@ export class TicketRepository implements ITicketRepository {
     return Promise.resolve(newTicket);
   }
 
-  async update(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
+  async update(id: number, ticket: TicketToUpdate): Promise<Ticket | undefined> {
     const existingTicketIndex = this.tickets.findIndex((t) => t.id === id);
     if (existingTicketIndex === -1) {
       return Promise.resolve(undefined);
