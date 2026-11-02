@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { TicketInvalidTransitionError } from '../../../src/errors/TicketErrors';
 import type { Ticket } from '../../../src/models/Ticket';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../../../src/repositories/interfaces/IEventoRepository';
@@ -19,6 +20,17 @@ const ticketReservado: Ticket = {
 const ticketConfirmado: Ticket = {
   ...ticketReservado,
   estado: 'CONFIRMADO',
+};
+
+const ticketUtilizado: Ticket = {
+  ...ticketConfirmado,
+  estado: 'UTILIZADO',
+  fechaValidacionPuerta: '2030-10-10T20:00:00.000Z',
+};
+
+const ticketCancelado: Ticket = {
+  ...ticketReservado,
+  estado: 'CANCELADO',
 };
 
 describe('Servicio de tickets: actualización', () => {
@@ -103,5 +115,29 @@ describe('Servicio de tickets: actualización', () => {
     expect(repositorioTickets.update).toHaveBeenCalledWith(ticketConfirmado.id, {
       estado: 'CANCELADO',
     });
+  });
+
+  it('rechaza cambiar un ticket utilizado a confirmado', async () => {
+    vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(ticketUtilizado);
+
+    await expect(
+      servicio.updateTicket(ticketUtilizado.id, {
+        estado: 'CONFIRMADO',
+      }),
+    ).rejects.toBeInstanceOf(TicketInvalidTransitionError);
+
+    expect(repositorioTickets.update).not.toHaveBeenCalled();
+  });
+
+  it('rechaza cambiar un ticket cancelado a confirmado', async () => {
+    vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(ticketCancelado);
+
+    await expect(
+      servicio.updateTicket(ticketCancelado.id, {
+        estado: 'CONFIRMADO',
+      }),
+    ).rejects.toBeInstanceOf(TicketInvalidTransitionError);
+
+    expect(repositorioTickets.update).not.toHaveBeenCalled();
   });
 });
