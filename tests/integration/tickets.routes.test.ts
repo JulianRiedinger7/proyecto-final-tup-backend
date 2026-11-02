@@ -133,5 +133,30 @@ describe('Rutas de tickets', () => {
         msg: expect.stringContaining('Datos inválidos'),
       });
     });
+
+    describe('PATCH /api/v1/tickets/:id', () => {
+      it('confirma un ticket reservado', async () => {
+        const respuestaCreacion = await request(app.instance)
+          .post('/api/v1/tickets')
+          .send({ eventoId, espectadorId });
+        const ticketCreado = respuestaCreacion.body.data as Ticket;
+
+        expect(respuestaCreacion.status).toBe(201);
+
+        const respuestaActualizacion = await request(app.instance)
+          .patch(`/api/v1/tickets/${ticketCreado.id}`)
+          .send({ estado: 'CONFIRMADO' });
+
+        expect(respuestaActualizacion.status).toBe(200);
+        expect(respuestaActualizacion.body).toEqual({
+          msg: 'Ticket actualizado',
+          code: 200,
+          data: {
+            ...ticketCreado,
+            estado: 'CONFIRMADO',
+          },
+        });
+      });
+    });
   });
 });
