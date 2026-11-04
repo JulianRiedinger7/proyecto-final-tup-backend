@@ -135,6 +135,40 @@ describe('Rutas de tickets', () => {
     });
   });
 
+  describe('GET /api/v1/tickets', () => {
+    it('devuelve los datos resumidos del evento y espectador en cada ticket', async () => {
+      await request(app.instance).post('/api/v1/tickets').send({ eventoId, espectadorId });
+
+      const respuesta = await request(app.instance).get('/api/v1/tickets').query({ eventoId });
+
+      expect(respuesta.status).toBe(200);
+      expect(respuesta.body).toMatchObject({
+        msg: 'Tickets encontrados',
+        code: 200,
+        data: {
+          total: 1,
+          items: [
+            {
+              evento: {
+                id: eventoId,
+                titulo: eventoDePrueba.titulo,
+                fechaHora: eventoDePrueba.fechaHora,
+                lugar: eventoDePrueba.lugar,
+              },
+              espectador: {
+                id: espectadorId,
+                nombre: espectadorDePrueba.nombre,
+                apellido: espectadorDePrueba.apellido,
+              },
+            },
+          ],
+        },
+      });
+      expect(respuesta.body.data.items[0]).not.toHaveProperty('eventoId');
+      expect(respuesta.body.data.items[0]).not.toHaveProperty('espectadorId');
+    });
+  });
+
   describe('PATCH /api/v1/tickets/:id', () => {
     it('confirma un ticket reservado', async () => {
       const respuestaCreacion = await request(app.instance)
