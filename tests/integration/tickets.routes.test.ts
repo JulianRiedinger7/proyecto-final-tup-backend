@@ -107,11 +107,31 @@ describe('Rutas de tickets', () => {
       );
 
       expect(respuestaConsulta.status).toBe(200);
-      expect(respuestaConsulta.body).toEqual({
+      expect(respuestaConsulta.body).toMatchObject({
         msg: 'Ticket encontrado',
         code: 200,
-        data: ticketCreado,
+        data: {
+          id: ticketCreado.id,
+          codigoQr: ticketCreado.codigoQr,
+          precioUnitario: ticketCreado.precioUnitario,
+          estado: ticketCreado.estado,
+          createdAt: ticketCreado.createdAt,
+          fechaValidacionPuerta: ticketCreado.fechaValidacionPuerta,
+          evento: {
+            id: eventoId,
+            titulo: eventoDePrueba.titulo,
+            fechaHora: eventoDePrueba.fechaHora,
+            lugar: eventoDePrueba.lugar,
+          },
+          espectador: {
+            id: espectadorId,
+            nombre: espectadorDePrueba.nombre,
+            apellido: espectadorDePrueba.apellido,
+          },
+        },
       });
+      expect(respuestaConsulta.body.data).not.toHaveProperty('eventoId');
+      expect(respuestaConsulta.body.data).not.toHaveProperty('espectadorId');
     });
 
     it('devuelve 404 cuando el ticket no existe', async () => {
