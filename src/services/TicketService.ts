@@ -33,34 +33,14 @@ export class TicketService implements ITicketService {
     const items: TicketListItem[] = [];
 
     for (const ticket of result.items) {
-      const evento = await this.eventos.findById(ticket.eventoId);
-      const espectador = await this.espectadores.findByID(ticket.espectadorId);
-
-      if (!evento || !espectador) {
-        throw new Error(`Dependencia no encontrada para el ticket ${ticket.id}`);
-      }
-
-      const { eventoId, espectadorId, ...ticketData } = ticket;
-      items.push({
-        ...ticketData,
-        evento: {
-          id: evento.id,
-          titulo: evento.titulo,
-          fechaHora: evento.fechaHora,
-          lugar: evento.lugar,
-        },
-        espectador: {
-          id: espectador.id,
-          nombre: espectador.nombre,
-          apellido: espectador.apellido,
-        },
-      });
+      items.push(await this.toTicketListItem(ticket));
     }
 
     return { items, total: result.total };
   }
-  getTicket(id: number): Promise<Ticket | undefined> {
-    return this.tickets.findById(id);
+  async getTicket(id: number): Promise<TicketListItem | undefined> {
+    const ticket = await this.tickets.findById(id);
+    return ticket ? this.toTicketListItem(ticket) : undefined;
   }
   async createTicket(ticket: NewTicket): Promise<Ticket> {
     const evento = await this.eventos.findById(ticket.eventoId);
@@ -110,6 +90,31 @@ export class TicketService implements ITicketService {
   }
   deleteTicket(id: number): Promise<Ticket | undefined> {
     return this.tickets.delete(id);
+  }
+
+  private async toTicketListItem(ticket: Ticket): Promise<TicketListItem> {
+    const evento = await this.eventos.findById(ticket.eventoId);
+    const espectador = await this.espectadores.findByID(ticket.espectadorId);
+
+    if (!evento || !espectador) {
+      throw new Error(`Dependencia no encontrada para el ticket ${ticket.id}`);
+    }
+
+    const { eventoId, espectadorId, ...ticketData } = ticket;
+    return {
+      ...ticketData,
+      evento: {
+        id: evento.id,
+        titulo: evento.titulo,
+        fechaHora: evento.fechaHora,
+        lugar: evento.lugar,
+      },
+      espectador: {
+        id: espectador.id,
+        nombre: espectador.nombre,
+        apellido: espectador.apellido,
+      },
+    };
   }
 
   private async ensureEventoHasCapacity(eventoId: number, cupoReservasWeb: number): Promise<void> {
