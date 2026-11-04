@@ -4,7 +4,7 @@ import {
   TicketEventStartedError,
   TicketInvalidTransitionError,
 } from '../errors/TicketErrors';
-import type { Ticket, TicketEstado } from '../models/Ticket';
+import type { Ticket, TicketEstado, TicketListItem } from '../models/Ticket';
 import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../repositories/interfaces/IEventoRepository';
 import type { ITicketRepository } from '../repositories/interfaces/ITicketRepository';
@@ -26,8 +26,38 @@ export class TicketService implements ITicketService {
     private readonly espectadores: IEspectadorRepository,
   ) {}
 
-  listTickets(params?: TicketFilterParams): Promise<{ items: Ticket[]; total: number }> {
-    return this.tickets.findAll(params);
+  async listTickets(
+    params?: TicketFilterParams,
+  ): Promise<{ items: TicketListItem[]; total: number }> {
+    const result = await this.tickets.findAll(params);
+    const items: TicketListItem[] = [];
+
+    for (const ticket of result.items) {
+      const evento = await this.eventos.findById(ticket.eventoId);
+      const espectador = await this.espectadores.findByID(ticket.espectadorId);
+
+      if (!evento || !espectador) {
+        throw new Error(`Dependencia no encontrada para el ticket ${ticket.id}`);
+      }
+
+      const { eventoId, espectadorId, ...ticketData } = ticket;
+      items.push({
+        ...ticketData,
+        evento: {
+          id: evento.id,
+          titulo: evento.titulo,
+          fechaHora: evento.fechaHora,
+          lugar: evento.lugar,
+        },
+        espectador: {
+          id: espectador.id,
+          nombre: espectador.nombre,
+          apellido: espectador.apellido,
+        },
+      });
+    }
+
+    return { items, total: result.total };
   }
   getTicket(id: number): Promise<Ticket | undefined> {
     return this.tickets.findById(id);
