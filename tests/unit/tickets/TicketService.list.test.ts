@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Espectadores } from '../../../src/models/Espectadores';
+import type { Eventos } from '../../../src/models/Eventos';
 import type { Ticket } from '../../../src/models/Ticket';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../../../src/repositories/interfaces/IEventoRepository';
@@ -19,9 +21,34 @@ const tickets: Ticket[] = [
   },
 ];
 
+const evento: Eventos = {
+  id: 1,
+  titulo: 'Evento de prueba',
+  descripcion: 'Descripción',
+  fechaHora: '2030-10-10T18:00:00.000Z',
+  lugar: 'Sala de prueba',
+  aforoMaximo: 100,
+  cupoReservasWeb: 50,
+  precioPreventa: 4000,
+  precioPuerta: 5000,
+};
+
+const espectador: Espectadores = {
+  id: 2,
+  nombre: 'Ana',
+  apellido: 'Pérez',
+  email: 'ana@example.com',
+  dni: '12345678',
+  telefono: '1112345678',
+  createdAt: new Date('2030-01-01T00:00:00.000Z'),
+  isActive: true,
+};
+
 describe('Servicio de tickets: listado', () => {
   let servicio: TicketService;
   let repositorioTickets: ITicketRepository;
+  let repositorioEventos: IEventoRepository;
+  let repositorioEspectadores: IEspectadorRepository;
 
   beforeEach(() => {
     repositorioTickets = {
@@ -32,17 +59,17 @@ describe('Servicio de tickets: listado', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const repositorioEventos: IEventoRepository = {
+    repositorioEventos = {
       findAll: vi.fn(),
-      findById: vi.fn(),
+      findById: vi.fn().mockResolvedValue(evento),
       create: vi.fn(),
       replace: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const repositorioEspectadores: IEspectadorRepository = {
+    repositorioEspectadores = {
       findAll: vi.fn(),
-      findByID: vi.fn(),
+      findByID: vi.fn().mockResolvedValue(espectador),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -62,6 +89,31 @@ describe('Servicio de tickets: listado', () => {
     const resultado = await servicio.listTickets(filtros);
 
     expect(repositorioTickets.findAll).toHaveBeenCalledWith(filtros);
-    expect(resultado).toEqual({ items: tickets, total: tickets.length });
+    expect(repositorioEventos.findById).toHaveBeenCalledWith(tickets[0].eventoId);
+    expect(repositorioEspectadores.findByID).toHaveBeenCalledWith(tickets[0].espectadorId);
+    expect(resultado).toEqual({
+      items: [
+        {
+          id: tickets[0].id,
+          codigoQr: tickets[0].codigoQr,
+          precioUnitario: tickets[0].precioUnitario,
+          estado: tickets[0].estado,
+          createdAt: tickets[0].createdAt,
+          fechaValidacionPuerta: tickets[0].fechaValidacionPuerta,
+          evento: {
+            id: evento.id,
+            titulo: evento.titulo,
+            fechaHora: evento.fechaHora,
+            lugar: evento.lugar,
+          },
+          espectador: {
+            id: espectador.id,
+            nombre: espectador.nombre,
+            apellido: espectador.apellido,
+          },
+        },
+      ],
+      total: tickets.length,
+    });
   });
 });
