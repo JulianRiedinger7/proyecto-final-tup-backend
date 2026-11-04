@@ -25,13 +25,13 @@ export class TicketRepository implements ITicketRepository {
       eventoId,
     } = params;
 
-    let result = this.filterTickets(this.tickets, search, estado, espectadorId, eventoId);
-    result = this.sortTickets(result, sortBy, sortOrder);
-    result = this.paginateTickets(result, page, limit);
+    const filtered = this.filterTickets(this.tickets, search, estado, espectadorId, eventoId);
+    const sorted = this.sortTickets(filtered, sortBy, sortOrder);
+    const items = this.paginateTickets(sorted, page, limit);
 
     return Promise.resolve({
-      items: result,
-      total: result.length,
+      items,
+      total: filtered.length,
     });
   }
 
