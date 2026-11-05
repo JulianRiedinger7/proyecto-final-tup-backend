@@ -27,8 +27,13 @@ export const newTicketSchema = z.strictObject({
 
 export type NewTicket = z.infer<typeof newTicketSchema>;
 
-export const patchTicketSchema = z.object({
-  estado: z.enum(TICKET_ESTADOS),
-});
+export const patchTicketSchema = z
+  .strictObject({
+    estado: z.enum(TICKET_ESTADOS).optional(),
+    fechaValidacionPuerta: z.iso.datetime().nullable().optional(),
+  })
+  .refine((ticket) => Object.keys(ticket).length > 0, {
+    message: 'Ingrese al menos un campo para modificar',
+  });
 
 export type PatchTicket = z.infer<typeof patchTicketSchema>;

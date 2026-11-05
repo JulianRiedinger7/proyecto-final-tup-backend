@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TicketInvalidTransitionError } from '../../../src/errors/TicketErrors';
+import type { Espectadores } from '../../../src/models/Espectadores';
+import type { Eventos } from '../../../src/models/Eventos';
 import type { Ticket } from '../../../src/models/Ticket';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import type { IEventoRepository } from '../../../src/repositories/interfaces/IEventoRepository';
@@ -33,9 +35,34 @@ const ticketCancelado: Ticket = {
   estado: 'CANCELADO',
 };
 
+const evento: Eventos = {
+  id: 1,
+  titulo: 'Evento de prueba',
+  descripcion: 'Descripción',
+  fechaHora: '2030-10-10T18:00:00.000Z',
+  lugar: 'Sala de prueba',
+  aforoMaximo: 100,
+  cupoReservasWeb: 50,
+  precioPreventa: 4000,
+  precioPuerta: 5000,
+};
+
+const espectador: Espectadores = {
+  id: 2,
+  nombre: 'Ana',
+  apellido: 'Pérez',
+  email: 'ana@example.com',
+  dni: '12345678',
+  telefono: '1112345678',
+  createdAt: new Date('2030-01-01T00:00:00.000Z'),
+  isActive: true,
+};
+
 describe('Servicio de tickets: actualización', () => {
   let servicio: TicketService;
   let repositorioTickets: ITicketRepository;
+  let repositorioEventos: IEventoRepository;
+  let repositorioEspectadores: IEspectadorRepository;
 
   beforeEach(() => {
     repositorioTickets = {
@@ -46,17 +73,17 @@ describe('Servicio de tickets: actualización', () => {
       update: vi.fn().mockResolvedValue(ticketConfirmado),
       delete: vi.fn(),
     };
-    const repositorioEventos: IEventoRepository = {
+    repositorioEventos = {
       findAll: vi.fn(),
-      findById: vi.fn(),
+      findById: vi.fn().mockResolvedValue(evento),
       create: vi.fn(),
       replace: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const repositorioEspectadores: IEspectadorRepository = {
+    repositorioEspectadores = {
       findAll: vi.fn(),
-      findByID: vi.fn(),
+      findByID: vi.fn().mockResolvedValue(espectador),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -77,7 +104,25 @@ describe('Servicio de tickets: actualización', () => {
     expect(repositorioTickets.update).toHaveBeenCalledWith(ticketReservado.id, {
       estado: 'CONFIRMADO',
     });
-    expect(resultado).toEqual(ticketConfirmado);
+    expect(resultado).toMatchObject({
+      id: ticketConfirmado.id,
+      codigoQr: ticketConfirmado.codigoQr,
+      precioUnitario: ticketConfirmado.precioUnitario,
+      estado: ticketConfirmado.estado,
+      createdAt: ticketConfirmado.createdAt,
+      fechaValidacionPuerta: ticketConfirmado.fechaValidacionPuerta,
+      evento: {
+        id: evento.id,
+        titulo: evento.titulo,
+        fechaHora: evento.fechaHora,
+        lugar: evento.lugar,
+      },
+      espectador: {
+        id: espectador.id,
+        nombre: espectador.nombre,
+        apellido: espectador.apellido,
+      },
+    });
   });
 
   it('cancela un ticket reservado', async () => {
@@ -102,6 +147,16 @@ describe('Servicio de tickets: actualización', () => {
     expect(repositorioTickets.update).toHaveBeenCalledWith(ticketConfirmado.id, {
       estado: 'UTILIZADO',
       fechaValidacionPuerta: '2030-10-10T20:00:00.000Z',
+    });
+  });
+
+  it('actualiza la fecha de validación sin requerir un cambio de estado', async () => {
+    const fechaValidacionPuerta = '2030-10-10T20:00:00.000Z';
+
+    await servicio.updateTicket(ticketReservado.id, { fechaValidacionPuerta });
+
+    expect(repositorioTickets.update).toHaveBeenCalledWith(ticketReservado.id, {
+      fechaValidacionPuerta,
     });
   });
 

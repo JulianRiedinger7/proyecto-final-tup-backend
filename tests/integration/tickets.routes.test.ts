@@ -207,10 +207,66 @@ describe('Rutas de tickets', () => {
         msg: 'Ticket actualizado',
         code: 200,
         data: {
-          ...ticketCreado,
+          id: ticketCreado.id,
+          codigoQr: ticketCreado.codigoQr,
+          precioUnitario: ticketCreado.precioUnitario,
           estado: 'CONFIRMADO',
+          createdAt: ticketCreado.createdAt,
+          fechaValidacionPuerta: ticketCreado.fechaValidacionPuerta,
+          evento: {
+            id: eventoId,
+            titulo: eventoDePrueba.titulo,
+            fechaHora: eventoDePrueba.fechaHora,
+            lugar: eventoDePrueba.lugar,
+          },
+          espectador: {
+            id: espectadorId,
+            nombre: espectadorDePrueba.nombre,
+            apellido: espectadorDePrueba.apellido,
+          },
         },
       });
+    });
+
+    it('permite modificar solo la fecha de validación en puerta', async () => {
+      const respuestaCreacion = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId, espectadorId });
+      const ticketCreado = respuestaCreacion.body.data as Ticket;
+      const fechaValidacionPuerta = '2030-10-10T20:00:00.000Z';
+
+      const respuestaActualizacion = await request(app.instance)
+        .patch(`/api/v1/tickets/${ticketCreado.id}`)
+        .send({ fechaValidacionPuerta });
+
+      expect(respuestaActualizacion.status).toBe(200);
+      expect(respuestaActualizacion.body.data).toMatchObject({
+        id: ticketCreado.id,
+        codigoQr: ticketCreado.codigoQr,
+        precioUnitario: ticketCreado.precioUnitario,
+        estado: ticketCreado.estado,
+        createdAt: ticketCreado.createdAt,
+        fechaValidacionPuerta,
+        evento: {
+          id: eventoId,
+          titulo: eventoDePrueba.titulo,
+          fechaHora: eventoDePrueba.fechaHora,
+          lugar: eventoDePrueba.lugar,
+        },
+        espectador: {
+          id: espectadorId,
+          nombre: espectadorDePrueba.nombre,
+          apellido: espectadorDePrueba.apellido,
+        },
+      });
+    });
+
+    it('rechaza campos que no sean estado o fecha de validación', async () => {
+      const respuesta = await request(app.instance)
+        .patch('/api/v1/tickets/1')
+        .send({ precioUnitario: 100 });
+
+      expect(respuesta.status).toBe(400);
     });
   });
 

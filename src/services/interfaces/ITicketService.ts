@@ -5,6 +5,6 @@ export interface ITicketService {
   listTickets(params?: TicketFilterParams): Promise<{ items: TicketListItem[]; total: number }>;
   getTicket(id: number): Promise<TicketListItem | undefined>;
   createTicket(ticket: NewTicket): Promise<Ticket>;
-  updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined>;
+  updateTicket(id: number, ticket: PatchTicket): Promise<TicketListItem | undefined>;
   deleteTicket(id: number): Promise<Ticket | undefined>;
 }

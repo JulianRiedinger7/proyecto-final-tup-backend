@@ -30,8 +30,7 @@ export type TicketToCreate = Omit<
   'id' | 'codigoQr' | 'createdAt' | 'fechaValidacionPuerta'
 >;
 
-export type TicketToUpdate = Pick<Ticket, 'estado'> &
-  Partial<Pick<Ticket, 'fechaValidacionPuerta'>>;
+export type TicketToUpdate = Partial<Pick<Ticket, 'estado' | 'fechaValidacionPuerta'>>;
 
 export type TicketSortBy = (typeof TICKET_SORT_BY)[number];
 export type TicketSortOrder = (typeof TICKET_SORT_ORDER)[number];
