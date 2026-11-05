@@ -77,7 +77,10 @@ export class TicketService implements ITicketService {
       return undefined;
     }
 
-    if (!validTicketTransitions[existingTicket.estado].includes(ticket.estado)) {
+    if (
+      ticket.estado !== undefined &&
+      !validTicketTransitions[existingTicket.estado].includes(ticket.estado)
+    ) {
       throw new TicketInvalidTransitionError(existingTicket.estado, ticket.estado);
     }
 

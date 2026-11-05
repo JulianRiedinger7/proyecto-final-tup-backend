@@ -105,6 +105,16 @@ describe('Servicio de tickets: actualización', () => {
     });
   });
 
+  it('actualiza la fecha de validación sin requerir un cambio de estado', async () => {
+    const fechaValidacionPuerta = '2030-10-10T20:00:00.000Z';
+
+    await servicio.updateTicket(ticketReservado.id, { fechaValidacionPuerta });
+
+    expect(repositorioTickets.update).toHaveBeenCalledWith(ticketReservado.id, {
+      fechaValidacionPuerta,
+    });
+  });
+
   it('cancela un ticket confirmado', async () => {
     vi.mocked(repositorioTickets.findById).mockResolvedValueOnce(ticketConfirmado);
 

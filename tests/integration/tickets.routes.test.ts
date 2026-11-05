@@ -212,6 +212,32 @@ describe('Rutas de tickets', () => {
         },
       });
     });
+
+    it('permite modificar solo la fecha de validación en puerta', async () => {
+      const respuestaCreacion = await request(app.instance)
+        .post('/api/v1/tickets')
+        .send({ eventoId, espectadorId });
+      const ticketCreado = respuestaCreacion.body.data as Ticket;
+      const fechaValidacionPuerta = '2030-10-10T20:00:00.000Z';
+
+      const respuestaActualizacion = await request(app.instance)
+        .patch(`/api/v1/tickets/${ticketCreado.id}`)
+        .send({ fechaValidacionPuerta });
+
+      expect(respuestaActualizacion.status).toBe(200);
+      expect(respuestaActualizacion.body.data).toMatchObject({
+        ...ticketCreado,
+        fechaValidacionPuerta,
+      });
+    });
+
+    it('rechaza campos que no sean estado o fecha de validación', async () => {
+      const respuesta = await request(app.instance)
+        .patch('/api/v1/tickets/1')
+        .send({ precioUnitario: 100 });
+
+      expect(respuesta.status).toBe(400);
+    });
   });
 
   describe('DELETE /api/v1/tickets/:id', () => {
