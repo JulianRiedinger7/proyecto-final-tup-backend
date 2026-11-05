@@ -207,8 +207,23 @@ describe('Rutas de tickets', () => {
         msg: 'Ticket actualizado',
         code: 200,
         data: {
-          ...ticketCreado,
+          id: ticketCreado.id,
+          codigoQr: ticketCreado.codigoQr,
+          precioUnitario: ticketCreado.precioUnitario,
           estado: 'CONFIRMADO',
+          createdAt: ticketCreado.createdAt,
+          fechaValidacionPuerta: ticketCreado.fechaValidacionPuerta,
+          evento: {
+            id: eventoId,
+            titulo: eventoDePrueba.titulo,
+            fechaHora: eventoDePrueba.fechaHora,
+            lugar: eventoDePrueba.lugar,
+          },
+          espectador: {
+            id: espectadorId,
+            nombre: espectadorDePrueba.nombre,
+            apellido: espectadorDePrueba.apellido,
+          },
         },
       });
     });
@@ -226,8 +241,23 @@ describe('Rutas de tickets', () => {
 
       expect(respuestaActualizacion.status).toBe(200);
       expect(respuestaActualizacion.body.data).toMatchObject({
-        ...ticketCreado,
+        id: ticketCreado.id,
+        codigoQr: ticketCreado.codigoQr,
+        precioUnitario: ticketCreado.precioUnitario,
+        estado: ticketCreado.estado,
+        createdAt: ticketCreado.createdAt,
         fechaValidacionPuerta,
+        evento: {
+          id: eventoId,
+          titulo: eventoDePrueba.titulo,
+          fechaHora: eventoDePrueba.fechaHora,
+          lugar: eventoDePrueba.lugar,
+        },
+        espectador: {
+          id: espectadorId,
+          nombre: espectadorDePrueba.nombre,
+          apellido: espectadorDePrueba.apellido,
+        },
       });
     });
 

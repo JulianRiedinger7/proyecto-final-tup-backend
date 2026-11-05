@@ -71,7 +71,7 @@ export class TicketService implements ITicketService {
       estado: 'RESERVADO',
     });
   }
-  async updateTicket(id: number, ticket: PatchTicket): Promise<Ticket | undefined> {
+  async updateTicket(id: number, ticket: PatchTicket): Promise<TicketListItem | undefined> {
     const existingTicket = await this.tickets.findById(id);
     if (!existingTicket) {
       return undefined;
@@ -89,7 +89,8 @@ export class TicketService implements ITicketService {
         ? { ...ticket, fechaValidacionPuerta: new Date().toISOString() }
         : ticket;
 
-    return this.tickets.update(id, update);
+    const updatedTicket = await this.tickets.update(id, update);
+    return updatedTicket ? this.toTicketListItem(updatedTicket) : undefined;
   }
   deleteTicket(id: number): Promise<Ticket | undefined> {
     return this.tickets.delete(id);
