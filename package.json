@@ -21,6 +21,7 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "format:check": "biome ci .",
+    "check": "pnpm format:check && pnpm typecheck && pnpm test",
     "prepare": "husky",
     "clean": "rimraf dist",
     "check:engines": "node -e \"console.log('node', process.version)\" && pnpm --version"
