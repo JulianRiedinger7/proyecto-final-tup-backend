@@ -18,7 +18,7 @@ export class EspectadorIdRepeatedError extends Error {
 export class EspectadorEmailRepeatedError extends Error {
     readonly StatusCode=409; 
     constructor () {
-        super('E-mail ya existente para otro usuario');
+        super('Ya existe un usuario con esa dirección de e-mail');
         this.name = 'EspectadorEmailRepeatedError';
     }
 }
