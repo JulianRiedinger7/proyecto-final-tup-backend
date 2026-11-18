@@ -35,7 +35,7 @@ De esta forma, cada `Route` solo solicita a la `Factory` el Controller que neces
 
 Para esta clase nos basamos en la teoria que afirma `los patrones vienen despues del problema`.
 
-Analizando las relaciones y comunicaciones entre los distintos módulos del sistema, llegamos a la conclusion de que actualmente no existe mayor acoplamiento estructural o incompatibilidad de interfaces que requieran envolver o adaptar las llamadas.Consideramos que actualmente el flujo en CircuitoVivo es directo: las rutas delegan en los controladores y estos interactúan con los servicios/repositorios.
+Analizando las relaciones y comunicaciones entre los distintos módulos del sistema, llegamos a la conclusion de que actualmente no existe mayor acoplamiento estructural o incompatibilidad de interfaces que requieran envolver o adaptar las llamadas. Consideramos que actualmente el flujo en CircuitoVivo es directo: las rutas delegan en los controladores y estos interactúan con los servicios/repositorios.
 
 #### Alternativas y sus trade-offs
 
