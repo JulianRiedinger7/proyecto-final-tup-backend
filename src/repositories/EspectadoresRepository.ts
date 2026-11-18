@@ -50,7 +50,7 @@ export class EspectadorRepository implements IEspectadorRepository {
   async findByEmail(email: string): Promise<Espectadores|undefined>{
     return Promise.resolve(this.espectadores.find((espectador) => espectador.email === email));
   }
-  
+
   private filterEspectadores(list: Espectadores[], search?: string): Espectadores[] {
     if (!search) return list;
     const term = search.toLowerCase();
@@ -112,4 +112,12 @@ export class EspectadorRepository implements IEspectadorRepository {
     }
     return espectador;
   }
+
+ async setActive(id: number): Promise<Espectadores | undefined> {
+  const espectador = await this.findByID(id);
+  if (espectador) {
+    espectador.isActive = true;
+  }
+  return espectador;
+}
 }

@@ -22,7 +22,7 @@ export class EspectadorService {
 
  async editarUsuario(
   id: number,
-  datos: Partial<{ nombre: string; apellido: string; email: string; dni: string; telefono: string }>
+  datos: Partial<{ nombre: string; apellido: string; email: string; dni: string; telefono: string; isActive: boolean }>
 ) {
   const espectador = await this.repo.findByID(id);
   if (!espectador) {
@@ -61,6 +61,28 @@ async eliminarUsuario(id: number) {
 
     return this.repo.delete(id); 
   }
+
+  async reactivar(id: number) {
+  const espectador = await this.repo.findByID(id);
+  if (!espectador) {
+      throw new EspectadorDependencyNotFoundError("Espectador no encontrado");
+    }
+
+  return this.repo.setActive(id);
+}
+
+async darDeBaja(id: number) {
+  const espectador = await this.repo.findByID(id);
+ if (!espectador) {
+      throw new EspectadorDependencyNotFoundError("Espectador no encontrado");
+    }
+
+  const tieneTicketsActivos = await new TicketRepository().existsByEspectadorAndEstados(
+    id.toString(),["RESERVADO", "CONFIRMADO"]);
+  if (tieneTicketsActivos) throw new ExpectadorInactivoNoPuedeReservar();
+
+  return this.repo.setActive(id);
 }
 }
+
 
