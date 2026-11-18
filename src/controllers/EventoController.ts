@@ -1,5 +1,5 @@
-import type { Request, Response } from 'express';
-import { EventoCapacityError, type EventoRepository } from '../repositories/EventoRepository';
+import type { NextFunction, Request, Response } from 'express';
+import type { IEventoRepository } from '../repositories/interfaces/IEventoRepository';
 import type {
   EventoFilterParams,
   EventoIdParams,
@@ -9,79 +9,92 @@ import type {
 import { errorResponse, successResponse } from '../utils/response';
 
 export class EventoController {
-  constructor(private readonly repo: EventoRepository) {}
+  constructor(private readonly repo: IEventoRepository) {}
 
-  findAll = async (req: Request, res: Response): Promise<Response> => {
+  findAll = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const filters = req.query as unknown as EventoFilterParams;
       const eventos = await this.repo.findAll(filters);
       return successResponse(res, 'Eventos encontrados', 200, eventos);
     } catch (error) {
-      console.error(`Error al buscar los eventos: ${error}`);
-      return errorResponse(res, 'Error al buscar los eventos', 500);
+      next(error);
     }
   };
 
-  findById = async (req: Request, res: Response): Promise<Response> => {
+  findById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as EventoIdParams;
       const evento = await this.repo.findById(id);
       if (!evento) return errorResponse(res, 'Evento no encontrado', 404);
       return successResponse(res, 'Evento encontrado', 200, evento);
     } catch (error) {
-      console.error(`Error al buscar el evento: ${error}`);
-      return errorResponse(res, 'Error al buscar el evento', 500);
+      next(error);
     }
   };
 
-  create = async (req: Request, res: Response): Promise<Response> => {
+  create = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const evento = await this.repo.create(req.body as NewEvento);
       return successResponse(res, 'Evento creado', 201, evento);
     } catch (error) {
-      return this.handleMutationError(res, error, 'crear');
+      next(error);
     }
   };
 
-  replace = async (req: Request, res: Response): Promise<Response> => {
+  replace = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as EventoIdParams;
       const evento = await this.repo.replace(id, req.body as NewEvento);
       if (!evento) return errorResponse(res, 'Evento no encontrado', 404);
       return successResponse(res, 'Evento reemplazado', 200, evento);
     } catch (error) {
-      return this.handleMutationError(res, error, 'reemplazar');
+      next(error);
     }
   };
 
-  update = async (req: Request, res: Response): Promise<Response> => {
+  update = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as EventoIdParams;
       const evento = await this.repo.update(id, req.body as PatchEvento);
       if (!evento) return errorResponse(res, 'Evento no encontrado', 404);
       return successResponse(res, 'Evento actualizado', 200, evento);
     } catch (error) {
-      return this.handleMutationError(res, error, 'actualizar');
+      next(error);
     }
   };
 
-  delete = async (req: Request, res: Response): Promise<Response> => {
+  delete = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as EventoIdParams;
       const evento = await this.repo.delete(id);
       if (!evento) return errorResponse(res, 'Evento no encontrado', 404);
       return successResponse(res, 'Evento eliminado', 200, evento);
     } catch (error) {
-      console.error(`Error al eliminar el evento: ${error}`);
-      return errorResponse(res, 'Error al eliminar el evento', 500);
+      next(error);
     }
   };
-
-  private handleMutationError(res: Response, error: unknown, action: string): Response {
-    if (error instanceof EventoCapacityError) {
-      return errorResponse(res, error.message, 400);
-    }
-    console.error(`Error al ${action} el evento: ${error}`);
-    return errorResponse(res, `Error al ${action} el evento`, 500);
-  }
 }

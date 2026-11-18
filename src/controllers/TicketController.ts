@@ -1,75 +1,90 @@
-import type { Request, Response } from 'express';
-import type { TicketRepository } from '../repositories/TicketRepository';
+import type { NextFunction, Request, Response } from 'express';
 import type { TicketFilterParams, TicketIdParams } from '../schemas/ticket.schema';
+import type { ITicketService } from '../services/interfaces/ITicketService';
 import { errorResponse, successResponse } from '../utils/response';
 
 export class TicketController {
-  constructor(private readonly repo: TicketRepository) {}
+  constructor(private readonly service: ITicketService) {}
 
-  findAll = async (req: Request, res: Response): Promise<Response> => {
+  findAll = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const filters = req.query as unknown as TicketFilterParams;
-      const tickets = await this.repo.findAll(filters);
+      const tickets = await this.service.listTickets(filters);
       return successResponse(res, 'Tickets encontrados', 200, tickets);
     } catch (error) {
-      console.error(`Error al buscar los tickets: ${error}`);
-      return errorResponse(res, 'Error al buscar los tickets', 500);
+      next(error);
     }
   };
 
-  findById = async (req: Request, res: Response): Promise<Response> => {
+  findById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as TicketIdParams;
 
-      const ticket = await this.repo.findById(id);
+      const ticket = await this.service.getTicket(id);
 
       if (!ticket) {
         return errorResponse(res, 'Ticket no encontrado', 404);
       }
       return successResponse(res, 'Ticket encontrado', 200, ticket);
     } catch (error) {
-      console.error(`Error al buscar el ticket: ${error}`);
-      return errorResponse(res, 'Error al buscar el ticket', 500);
+      next(error);
     }
   };
 
-  create = async (req: Request, res: Response): Promise<Response> => {
+  create = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const ticketData = req.body;
-      const newTicket = await this.repo.create(ticketData);
+      const newTicket = await this.service.createTicket(ticketData);
       return successResponse(res, 'Ticket creado', 201, newTicket);
     } catch (error) {
-      console.error(`Error al crear el ticket: ${error}`);
-      return errorResponse(res, 'Error al crear el ticket', 500);
+      next(error);
     }
   };
 
-  delete = async (req: Request, res: Response): Promise<Response> => {
+  delete = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as TicketIdParams;
-      const deletedTicket = await this.repo.delete(id);
+      const deletedTicket = await this.service.deleteTicket(id);
       if (!deletedTicket) {
         return errorResponse(res, 'Ticket no encontrado', 404);
       }
       return successResponse(res, 'Ticket eliminado', 200, deletedTicket);
     } catch (error) {
-      console.error(`Error al eliminar el ticket: ${error}`);
-      return errorResponse(res, 'Error al eliminar el ticket', 500);
+      next(error);
     }
   };
 
-  update = async (req: Request, res: Response): Promise<Response> => {
+  update = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | undefined> => {
     try {
       const { id } = req.params as unknown as TicketIdParams;
       const ticketData = req.body;
-      const updatedTicket = await this.repo.update(id, ticketData);
+      const updatedTicket = await this.service.updateTicket(id, ticketData);
       if (!updatedTicket) {
         return errorResponse(res, 'Ticket no encontrado', 404);
       }
       return successResponse(res, 'Ticket actualizado', 200, updatedTicket);
     } catch (error) {
-      console.error(`Error al actualizar el ticket: ${error}`);
-      return errorResponse(res, 'Error al actualizar el ticket', 500);
+      next(error);
     }
   };
 }

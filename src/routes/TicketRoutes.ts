@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { TicketController } from '../controllers/TicketController';
+import type { TicketController } from '../controllers/TicketController';
 import { validate } from '../middlewares/validate';
-import { TicketRepository } from '../repositories/TicketRepository';
 import {
   newTicketSchema,
   patchTicketSchema,
@@ -12,7 +11,7 @@ import {
 export class TicketRoutes {
   private router: Router;
 
-  constructor(private readonly ticketController = new TicketController(new TicketRepository())) {
+  constructor(private readonly ticketController: TicketController) {
     this.router = Router();
     this.initRoutes();
   }
