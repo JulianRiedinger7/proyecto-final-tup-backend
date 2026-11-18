@@ -12,30 +12,22 @@
 - Matias Ledesma Gonzalez (GitHub: `@Matiaslegon`)
 - Clara Zivano (GitHub: `@clazlo`)
 
-## Metodología de Trabajo y Flujo de GIT
-
-Como equipo se decidió adoptar las siguientes pautas:
-
-- **Rama principal (`main`):** contiene solo código estable y probado. No se realizan commits directos sobre esta rama.
-- **Rama de integración (`dev`) y ramas cortas por funcionalidad:** cada integrante aísla su trabajo en ramas cortas y descriptivas con sus iniciales (ej. `julianriedinger27/cv-23-ticket-service-logica-de-negocio-backend`).
-- **Revisión mediante Pull Requests:** una vez finalizada la funcionalidad, se realiza un Pull Request. Otro integrante del equipo revisa el código, sugiere mejoras y aprueba el merge si todo es correcto.
-
 ## Tecnologías y stack
 
-| Área            | Tecnología         | Versión                                | Uso                                           |
-| --------------- | ------------------ | -------------------------------------- | --------------------------------------------- |
-| Runtime         | Node.js            | `>=20` (recomendado 22, ver `.nvmrc`)  | Ejecución del servidor                        |
-| Lenguaje        | TypeScript         | `^5.6.3`                               | Tipado estático y compilación a `dist/`       |
-| Framework       | Express            | `^4.21.2`                              | API HTTP / routing                            |
-| Validación      | Zod                | `4.6.5`                                | Validación de variables de entorno y requests |
-| Package manager | pnpm               | `>=9` (recomendado `10.33.0`)          | Instalación reproducible vía `pnpm-lock.yaml` |
-| Testing         | Vitest + Supertest | `^4.1.0` / `^7.1.4`                    | Tests unitarios y de integración HTTP         |
-| Calidad         | Biome + Husky      | `2.5.15` / `9.1.7`                     | Lint, formato y hook `pre-commit`             |
-| Env config      | dotenv             | `^16.4.7`                              | Carga de variables de entorno desde `.env`    |
-| CORS            | cors               | `^2.8.5`                               | Control de orígenes permitidos                |
-| Seguridad       | helmet             | `8.3.0`                                | Headers HTTP de seguridad                     |
-| Logs HTTP       | morgan             | `1.12.1`                               | Log de peticiones (`dev` / `combined`)        |
-| Dev runner      | tsx                | `^4.19.2`                              | `pnpm dev` con recarga (`tsx watch`)          |
+| Área            | Tecnología         | Versión                               | Uso                                           |
+| --------------- | ------------------ | ------------------------------------- | --------------------------------------------- |
+| Runtime         | Node.js            | `>=20` (recomendado 22, ver `.nvmrc`) | Ejecución del servidor                        |
+| Lenguaje        | TypeScript         | `^5.6.3`                              | Tipado estático y compilación a `dist/`       |
+| Framework       | Express            | `^4.21.2`                             | API HTTP / routing                            |
+| Validación      | Zod                | `4.6.5`                               | Validación de variables de entorno y requests |
+| Package manager | pnpm               | `>=9` (recomendado `10.33.0`)         | Instalación reproducible vía `pnpm-lock.yaml` |
+| Testing         | Vitest + Supertest | `^4.1.0` / `^7.1.4`                   | Tests unitarios y de integración HTTP         |
+| Calidad         | Biome + Husky      | `2.5.15` / `9.1.7`                    | Lint, formato y hook `pre-commit`             |
+| Env config      | dotenv             | `^16.4.7`                             | Carga de variables de entorno desde `.env`    |
+| CORS            | cors               | `^2.8.5`                              | Control de orígenes permitidos                |
+| Seguridad       | helmet             | `8.3.0`                               | Headers HTTP de seguridad                     |
+| Logs HTTP       | morgan             | `1.12.1`                              | Log de peticiones (`dev` / `combined`)        |
+| Dev runner      | tsx                | `^4.19.2`                             | `pnpm dev` con recarga (`tsx watch`)          |
 
 ## Requisitos previos
 
