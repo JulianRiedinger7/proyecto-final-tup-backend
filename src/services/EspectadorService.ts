@@ -2,6 +2,7 @@ import { EspectadorDependencyNotFoundError, EspectadorIdRepeatedError, Espectado
 import type { EspectadoresSortBy, EspectadoresSortOrder } from "../models/Espectadores";
 import type { EspectadoresFilterParams, NewEspectador, deleteEspectador, patchEspectador } from "../schemas/espectador.schema";
 import { IEspectadorRepository } from "../repositories/interfaces/IEspectadorRepository";
+import { TicketRepository } from "../repositories/TicketRepository";
 
 export class EspectadorService {
   constructor(private repo: IEspectadorRepository) {}
@@ -45,5 +46,21 @@ export class EspectadorService {
   return this.repo.update(id, datos);
 }
 
+async eliminarUsuario(id: number) {
+    const espectador = await this.repo.findByID(id);
+    if (!espectador) {
+      throw new EspectadorDependencyNotFoundError("Espectador no encontrado");
+    }
+
+    const tieneTicketsActivos = await new TicketRepository().existsByEspectadorAndEstados(
+      id.toString(),["RESERVADO", "CONFIRMADO"]);
+   
+      if (tieneTicketsActivos) {
+      throw new EspectadorStatusCannotDecline();
+    }
+
+    return this.repo.delete(id); 
+  }
+}
 }
 

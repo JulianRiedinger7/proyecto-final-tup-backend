@@ -26,7 +26,7 @@ export class EspectadorEmailRepeatedError extends Error {
 export class EspectadorStatusCannotDecline extends Error{
     readonly StatusCode = 409; 
     constructor () {
-        super('No se puede dar de baja teniendo tickets RESERVADOS o CONFIRMADOS');
+        super('No se puede dar de baja un usuario que tiene tickets RESERVADOS o CONFIRMADOS');
         this.name = 'EspectadorStatusCannotDecline';
     }
 }

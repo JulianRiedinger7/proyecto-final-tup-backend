@@ -8,4 +8,5 @@ export interface ITicketRepository {
   create(ticket: TicketToCreate): Promise<Ticket>;
   update(id: number, ticket: TicketToUpdate): Promise<Ticket | undefined>;
   delete(id: number): Promise<Ticket | undefined>;
+  existsByEspectadorAndEstados(espectadorId: string, estados: string[]): Promise<boolean>;
 }
