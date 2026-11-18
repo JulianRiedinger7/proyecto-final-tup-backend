@@ -1,7 +1,5 @@
-import { EspectadorDependencyNotFoundError, EspectadorIdRepeatedError, EspectadorEmailRepeatedError, EspectadorStatusCannotDecline, ExpectadorInactivoNoPuedeReservar } from "../errors/EspectadorError";
-import type { EspectadoresSortBy, EspectadoresSortOrder } from "../models/Espectadores";
-import type { EspectadoresFilterParams, NewEspectador, deleteEspectador, patchEspectador } from "../schemas/espectador.schema";
-import { IEspectadorRepository } from "../repositories/interfaces/IEspectadorRepository";
+import { EspectadorDependencyNotFoundError, EspectadorIdRepeatedError, EspectadorEmailRepeatedError, EspectadorStatusCannotDecline } from "../errors/EspectadorError";
+import type { IEspectadorRepository } from "../repositories/interfaces/IEspectadorRepository";
 import { TicketRepository } from "../repositories/TicketRepository";
 
 export class EspectadorService {
@@ -67,8 +65,9 @@ async eliminarUsuario(id: number) {
   if (!espectador) {
       throw new EspectadorDependencyNotFoundError("Espectador no encontrado");
     }
-
-  return this.repo.setActive(id);
+    if (!espectador.isActive) {
+  return this.repo.changeIsActive(id);
+    } else {return espectador}
 }
 
 async darDeBaja(id: number) {
@@ -77,11 +76,12 @@ async darDeBaja(id: number) {
       throw new EspectadorDependencyNotFoundError("Espectador no encontrado");
     }
 
+    if (espectador.isActive) {
   const tieneTicketsActivos = await new TicketRepository().existsByEspectadorAndEstados(
     id.toString(),["RESERVADO", "CONFIRMADO"]);
-  if (tieneTicketsActivos) throw new ExpectadorInactivoNoPuedeReservar();
-
-  return this.repo.setActive(id);
+  if (tieneTicketsActivos) throw new EspectadorStatusCannotDecline();
+  return this.repo.changeIsActive(id); 
+    } else {return espectador}
 }
 }
 

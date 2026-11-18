@@ -13,5 +13,5 @@ export interface IEspectadorRepository {
   create(params: NewEspectador): Promise<Espectadores>;
   update(id: number, cambiosEspectador: PatchEspectador): Promise<Espectadores | undefined>;
   delete(id: number): Promise<Espectadores | undefined>;
-  setActive(id: number): Promise<Espectadores|undefined>;
+  changeIsActive(id: number): Promise<Espectadores|undefined>;
 }

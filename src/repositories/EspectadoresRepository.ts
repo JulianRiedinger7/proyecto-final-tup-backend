@@ -113,11 +113,12 @@ export class EspectadorRepository implements IEspectadorRepository {
     return espectador;
   }
 
- async setActive(id: number): Promise<Espectadores | undefined> {
+ async changeIsActive(id: number): Promise<Espectadores | undefined> {
   const espectador = await this.findByID(id);
   if (espectador) {
-    espectador.isActive = true;
+    espectador.isActive = !espectador.isActive;
   }
   return espectador;
 }
+
 }
