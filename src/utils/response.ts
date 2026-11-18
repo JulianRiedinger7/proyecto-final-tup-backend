@@ -21,5 +21,16 @@ export function errorResponse(
   return res.status(code).json({
     msg,
     code,
-  });
-}
+  });}
+
+export function conflictResponse(
+  res: Response,
+  msg: string = 'Ya existen valores para ese campo',
+  code: number=409,
+): Response {
+return res.status(code).json({
+  msg, code,
+});}
+
+
+
