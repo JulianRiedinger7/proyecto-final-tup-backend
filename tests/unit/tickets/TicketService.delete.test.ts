@@ -25,6 +25,7 @@ describe('Servicio de tickets: eliminación', () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       countNonCancelledByEvento: vi.fn(),
+      existsByEspectadorAndEstados: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn().mockResolvedValue(ticket),
@@ -41,8 +42,11 @@ describe('Servicio de tickets: eliminación', () => {
     const repositorioEspectadores: IEspectadorRepository = {
       findAll: vi.fn(),
       findByID: vi.fn(),
+      findByDNI: vi.fn(),
+      findByEmail: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      changeIsActive: vi.fn(),
       delete: vi.fn(),
     };
 

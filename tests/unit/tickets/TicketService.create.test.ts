@@ -45,6 +45,7 @@ describe('Servicio de tickets: creación', () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       countNonCancelledByEvento: vi.fn().mockResolvedValue(0),
+      existsByEspectadorAndEstados: vi.fn().mockResolvedValue(false),
       create: vi.fn(async (datosTicket) => ({
         ...datosTicket,
         id: 3,
@@ -67,8 +68,11 @@ describe('Servicio de tickets: creación', () => {
     repositorioEspectadores = {
       findAll: vi.fn(),
       findByID: vi.fn().mockResolvedValue(espectador),
+      findByDNI: vi.fn(),
+      findByEmail: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      changeIsActive: vi.fn(),
       delete: vi.fn(),
     };
 

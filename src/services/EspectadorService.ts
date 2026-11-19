@@ -6,12 +6,28 @@ import {
 } from '../errors/EspectadorError';
 import type { Espectadores } from '../models/Espectadores';
 import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
-import { TicketRepository } from '../repositories/TicketRepository';
+import type { ITicketRepository } from '../repositories/interfaces/ITicketRepository';
 import type { EspectadoresFilterParams } from '../schemas/espectador.schema';
 import type { IEspectadorService } from './interfaces/IEspectadorService';
 
+
 export class EspectadorService implements IEspectadorService {
-  constructor(private repo: IEspectadorRepository) {}
+  constructor(private repo: IEspectadorRepository, private ticketRepo: ITicketRepository) {}
+
+
+ async create(datos: Espectadores) {
+  const dniExistente = await this.repo.findByDNI(datos.dni);
+  if (dniExistente) {
+    throw new EspectadorIdRepeatedError("Ya existe un usuario con ese DNI");
+  }
+
+  const emailExistente = await this.repo.findByEmail(datos.email);
+  if (emailExistente) {
+    throw new EspectadorEmailRepeatedError();
+  }
+
+  return this.repo.create(datos);
+}
 
   async findAll(params: EspectadoresFilterParams = {}): Promise<{
     items: Espectadores[];
@@ -82,7 +98,7 @@ export class EspectadorService implements IEspectadorService {
       throw new EspectadorDependencyNotFoundError('Espectador no encontrado');
     }
 
-    const tieneTicketsActivos = await new TicketRepository().existsByEspectadorAndEstados(
+    const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(
       id.toString(),
       ['RESERVADO', 'CONFIRMADO'],
     );
@@ -112,15 +128,16 @@ export class EspectadorService implements IEspectadorService {
       throw new EspectadorDependencyNotFoundError('Espectador no encontrado');
     }
 
-    if (espectador.isActive) {
-      const tieneTicketsActivos = await new TicketRepository().existsByEspectadorAndEstados(
-        id.toString(),
-        ['RESERVADO', 'CONFIRMADO'],
-      );
-      if (tieneTicketsActivos) throw new EspectadorStatusCannotDecline();
-      return this.repo.changeIsActive(id);
-    } else {
+    if (!espectador.isActive) {
       return espectador;
     }
+
+    const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(
+      id.toString(), 
+      ['RESERVADO', 'CONFIRMADO'],
+    );
+    if (tieneTicketsActivos) throw new EspectadorStatusCannotDecline();
+
+    return this.repo.changeIsActive(id);
   }
 }

@@ -45,7 +45,7 @@ export class App {
 
     const eventoService = new EventoService(eventoRepo, ticketRepo);
     const ticketService = new TicketService(ticketRepo, eventoRepo, espectadorRepo);
-    const espectadorService = new EspectadorService(espectadorRepo);
+    const espectadorService = new EspectadorService(espectadorRepo, ticketRepo);
 
     this.instance.use(
       '/api/v1/eventos',

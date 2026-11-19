@@ -68,6 +68,7 @@ describe('Servicio de tickets: actualización', () => {
     repositorioTickets = {
       findAll: vi.fn(),
       findById: vi.fn().mockResolvedValue(ticketReservado),
+      existsByEspectadorAndEstados: vi.fn(),
       countNonCancelledByEvento: vi.fn(),
       create: vi.fn(),
       update: vi.fn().mockResolvedValue(ticketConfirmado),
@@ -85,8 +86,11 @@ describe('Servicio de tickets: actualización', () => {
     repositorioEspectadores = {
       findAll: vi.fn(),
       findByID: vi.fn().mockResolvedValue(espectador),
+      findByDNI: vi.fn(),
+      findByEmail: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      changeIsActive: vi.fn(),
       delete: vi.fn(),
     };
 

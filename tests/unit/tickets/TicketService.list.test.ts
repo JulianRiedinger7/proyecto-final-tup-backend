@@ -55,6 +55,7 @@ describe('Servicio de tickets: listado', () => {
       findAll: vi.fn().mockResolvedValue({ items: tickets, total: tickets.length }),
       findById: vi.fn(),
       countNonCancelledByEvento: vi.fn(),
+      existsByEspectadorAndEstados: vi.fn().mockResolvedValue(false),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -71,9 +72,12 @@ describe('Servicio de tickets: listado', () => {
     repositorioEspectadores = {
       findAll: vi.fn(),
       findByID: vi.fn().mockResolvedValue(espectador),
+      findByDNI: vi.fn(),
+      findByEmail: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      changeIsActive: vi.fn(),
     };
 
     servicio = new TicketService(repositorioTickets, repositorioEventos, repositorioEspectadores);
