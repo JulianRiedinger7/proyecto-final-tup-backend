@@ -3,6 +3,7 @@ import type { Espectadores } from '../../../src/models/Espectadores';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import { EspectadorService} from '../../../src/services/EspectadorService';
 import { EspectadorEmailRepeatedError, EspectadorIdRepeatedError } from '../../../src/errors/EspectadorError';
+import type { ITicketRepository } from '../../../src/repositories/interfaces/ITicketRepository';
 
 const espectador: Espectadores = {
     id: 1,
@@ -18,6 +19,7 @@ const espectador: Espectadores = {
 describe('Servicios de usuarios: creación de un usuario', () =>{
       let servicio: EspectadorService;
       let repositorioEspectador: IEspectadorRepository;
+      let repositorioTicket: ITicketRepository;
 
       beforeEach(() => {
           repositorioEspectador = {
@@ -30,8 +32,13 @@ describe('Servicios de usuarios: creación de un usuario', () =>{
             changeIsActive: vi.fn(),
             delete: vi.fn(),
           };
+
+          repositorioTicket = {
+        existsByEspectadorAndEstados: vi.fn().mockResolvedValue(false),
+        } as unknown as ITicketRepository;
+
       
-          servicio = new EspectadorService(repositorioEspectador);
+          servicio = new EspectadorService(repositorioEspectador, repositorioTicket);
         });
     
      afterEach(() => {vi.useRealTimers();});
