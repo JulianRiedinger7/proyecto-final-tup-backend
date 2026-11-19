@@ -2,17 +2,23 @@ import { Router } from 'express';
 import { EventoController } from '../controllers/EventoController';
 import { validate } from '../middlewares/validate';
 import { EventoRepository } from '../repositories/EventoRepository';
+import { TicketRepository } from '../repositories/TicketRepository';
 import {
   eventoIdParamsSchema,
   eventoQuerySchema,
   newEventoSchema,
   patchEventoSchema,
 } from '../schemas/evento.schema';
+import { EventoService } from '../services/EventoService';
 
 export class EventoRoutes {
   private router: Router;
 
-  constructor(private readonly eventoController = new EventoController(new EventoRepository())) {
+  constructor(
+    private readonly eventoController = new EventoController(
+      new EventoService(new EventoRepository(), new TicketRepository()),
+    ),
+  ) {
     this.router = Router();
     this.initRoutes();
   }
