@@ -11,6 +11,7 @@ import type { ITicketRepository } from '../repositories/interfaces/ITicketReposi
 import type { NewTicket, PatchTicket, TicketFilterParams } from '../schemas/ticket.schema';
 import { getArgentinaDate, hasDateStarted } from '../utils/date';
 import type { ITicketService } from './interfaces/ITicketService';
+import { EspectadorDependencyNotFoundError, ExpectadorInactivoNoPuedeReservar } from '../errors/EspectadorError';
 
 const validTicketTransitions: Record<TicketEstado, readonly TicketEstado[]> = {
   RESERVADO: ['CONFIRMADO', 'CANCELADO'],
@@ -127,4 +128,15 @@ export class TicketService implements ITicketService {
       throw new TicketCapacityExceededError();
     }
   }
+
+  async reservar(espectadorId: number, eventoId: number): Promise<Ticket | undefined> {
+  const espectador = await this.espectadores.findByID(espectadorId);
+  if (!espectador) throw new EspectadorDependencyNotFoundError('Espectador no encontrado');
+
+  if (!espectador.isActive) {
+    throw new ExpectadorInactivoNoPuedeReservar(); 
+  }
+
+  return this.createTicket({ espectadorId, eventoId });
+}
 }

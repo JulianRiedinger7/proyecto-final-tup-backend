@@ -1,3 +1,4 @@
+// import { number } from 'zod/v4/core/regexes.cjs';
 import listaEspectadores from '../../data/espectadores.json';
 import type {
   Espectadores,
@@ -40,6 +41,14 @@ export class EspectadorRepository implements IEspectadorRepository {
 
   async findByID(id: number): Promise<Espectadores | undefined> {
     return Promise.resolve(this.espectadores.find((espectador) => espectador.id === id));
+  }
+
+  async findByDNI(dni: string): Promise<Espectadores | undefined> {
+    return Promise.resolve(this.espectadores.find((espectador) => espectador.dni === dni)); 
+  }
+
+  async findByEmail(email: string): Promise<Espectadores|undefined>{
+    return Promise.resolve(this.espectadores.find((espectador) => espectador.email === email));
   }
 
   private filterEspectadores(list: Espectadores[], search?: string): Espectadores[] {
@@ -103,4 +112,13 @@ export class EspectadorRepository implements IEspectadorRepository {
     }
     return espectador;
   }
+
+ async changeIsActive(id: number): Promise<Espectadores | undefined> {
+  const espectador = await this.findByID(id);
+  if (espectador) {
+    espectador.isActive = !espectador.isActive;
+  }
+  return espectador;
+}
+
 }

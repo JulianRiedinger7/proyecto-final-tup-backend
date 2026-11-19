@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { EspectadorController } from '../controllers/EspectadorController';
+import type { EspectadorController } from '../controllers/EspectadorController';
 import { validate } from '../middlewares/validate';
-import { EspectadorRepository } from '../repositories/EspectadoresRepository';
 import {
   deleteEspectadorSchema,
   espectadoresQuerySchema,
@@ -12,7 +11,7 @@ import {
 export class EspectadorRoutes {
   private router: Router;
 
-  constructor(private readonly controller = new EspectadorController(new EspectadorRepository())) {
+  constructor(private readonly controller: EspectadorController) {
     this.router = Router();
     this.initRoutes();
   }

@@ -123,4 +123,11 @@ export class TicketRepository implements ITicketRepository {
       return matchesEstado && matchesEspectadorId && matchesEventoId && matchesSearch;
     });
   }
+
+  async existsByEspectadorAndEstados(espectadorId: string, estados: string[]) {
+    return this.tickets.some(
+      (ticket) =>
+        String(ticket.espectadorId) === espectadorId && estados.includes(ticket.estado),
+    );
+  }
 }
