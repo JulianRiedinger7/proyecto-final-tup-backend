@@ -4,7 +4,7 @@ import type { IEspectadorRepository } from '../../../src/repositories/interfaces
 import { EspectadorService} from '../../../src/services/EspectadorService';
 import { EspectadorEmailRepeatedError, EspectadorIdRepeatedError } from '../../../src/errors/EspectadorError';
 import type { ITicketRepository } from '../../../src/repositories/interfaces/ITicketRepository';
-import { email } from 'zod';
+
 
 const espectador: Espectadores = {
     id: 1,
