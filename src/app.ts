@@ -14,6 +14,7 @@ import { EspectadorRoutes } from './routes/EspectadorRoutes';
 import { EventoRoutes } from './routes/EventoRoutes';
 import { TicketRoutes } from './routes/TicketRoutes';
 import { EspectadorService } from './services/EspectadorService';
+import { EventoService } from './services/EventoService';
 import { TicketService } from './services/TicketService';
 import { successResponse } from './utils/response';
 
@@ -42,12 +43,13 @@ export class App {
     const espectadorRepo = new EspectadorRepository();
     const ticketRepo = new TicketRepository();
 
+    const eventoService = new EventoService(eventoRepo, ticketRepo);
     const ticketService = new TicketService(ticketRepo, eventoRepo, espectadorRepo);
     const espectadorService = new EspectadorService(espectadorRepo);
 
     this.instance.use(
       '/api/v1/eventos',
-      new EventoRoutes(new EventoController(eventoRepo)).getRoutes(),
+      new EventoRoutes(new EventoController(eventoService)).getRoutes(),
     );
     this.instance.use(
       '/api/v1/tickets',
