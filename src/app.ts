@@ -43,7 +43,7 @@ export class App {
     const ticketRepo = new TicketRepository();
 
     const ticketService = new TicketService(ticketRepo, eventoRepo, espectadorRepo);
-    const espectadorService = new EspectadorService(espectadorRepo);
+    const espectadorService = new EspectadorService(espectadorRepo, ticketRepo);
 
     this.instance.use(
       '/api/v1/eventos',
