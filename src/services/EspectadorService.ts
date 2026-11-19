@@ -13,6 +13,10 @@ import type { IEspectadorService } from './interfaces/IEspectadorService';
 export class EspectadorService implements IEspectadorService {
   constructor(private repo: IEspectadorRepository) {}
 
+  async create(params: {nombre: string; apellido: string; email: string; dni: string; telefono: string;}): Promise<Espectadores | undefined> {
+    return this.repo.create(params);
+  }
+
   async findAll(params: EspectadoresFilterParams = {}): Promise<{
     items: Espectadores[];
     total: number;
