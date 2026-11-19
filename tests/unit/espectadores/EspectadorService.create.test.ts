@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Espectadores } from '../../../src/models/Espectadores';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import { EspectadorService} from '../../../src/services/EspectadorService';
+import { EspectadorEmailRepeatedError, EspectadorIdRepeatedError } from '../../../src/errors/EspectadorError';
 
 const espectador: Espectadores = {
     id: 1,
@@ -49,4 +50,20 @@ describe('Servicios de usuarios: creación de un usuario', () =>{
             createdAt: espectador.createdAt,
         });
      });
+
+    it('no crea un espectador si el dni ya existe', async () => {
+        vi.mocked(repositorioEspectador.findByDNI).mockResolvedValue(espectador);
+        await expect(servicio.create(espectador)).rejects.toThrow(EspectadorIdRepeatedError);
+
+    expect(repositorioEspectador.findByDNI).toHaveBeenCalledWith(espectador.dni);
+    expect(repositorioEspectador.create).not.toHaveBeenCalled();
+    });
+
+    it ('no crea un espectador con email repetido', async ()=> {
+        vi.mocked(repositorioEspectador.findByEmail).mockResolvedValue(espectador);
+        await expect(servicio.create(espectador)).rejects.toThrow(EspectadorEmailRepeatedError);
+
+        expect(repositorioEspectador.findByEmail).toHaveBeenCalledWith(espectador.email);
+        expect(repositorioEspectador.create).not.toHaveBeenCalled();
+    });
 })

@@ -13,9 +13,19 @@ import type { IEspectadorService } from './interfaces/IEspectadorService';
 export class EspectadorService implements IEspectadorService {
   constructor(private repo: IEspectadorRepository) {}
 
-  async create(params: {nombre: string; apellido: string; email: string; dni: string; telefono: string;}): Promise<Espectadores | undefined> {
-    return this.repo.create(params);
+ async create(datos: Espectadores) {
+  const dniExistente = await this.repo.findByDNI(datos.dni);
+  if (dniExistente) {
+    throw new EspectadorIdRepeatedError("Ya existe un usuario con ese DNI");
   }
+
+  const emailExistente = await this.repo.findByEmail(datos.email);
+  if (emailExistente) {
+    throw new EspectadorEmailRepeatedError();
+  }
+
+  return this.repo.create(datos);
+}
 
   async findAll(params: EspectadoresFilterParams = {}): Promise<{
     items: Espectadores[];
