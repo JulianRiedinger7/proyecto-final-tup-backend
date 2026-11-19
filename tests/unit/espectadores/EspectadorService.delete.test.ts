@@ -4,6 +4,7 @@ import type { Espectadores } from '../../../src/models/Espectadores';
 import type { IEspectadorRepository } from '../../../src/repositories/interfaces/IEspectadorRepository';
 import { EspectadorService} from '../../../src/services/EspectadorService';
 import type { ITicketRepository } from '../../../src/repositories/interfaces/ITicketRepository';
+import { EspectadorStatusCannotDecline } from '../../../src/errors/EspectadorError';
 // import { EspectadorEmailRepeatedError, EspectadorIdRepeatedError } from '../../../src/errors/EspectadorError';
 
 const espectador: Espectadores = {
@@ -52,5 +53,15 @@ describe('Servicios de usuarios: eliminación', () => {
         expect(repositorioEspectador.delete).toHaveBeenCalledWith(espectador.id);
         expect(resultado).toEqual(espectador);
     });
+
+    it('no elimina si el espectador tiene tickets activos', async () => {
+    vi.mocked(repositorioTicket.existsByEspectadorAndEstados).mockResolvedValue(true);
+
+    await expect(servicio.eliminarUsuario(espectador.id))
+        .rejects.toThrow(EspectadorStatusCannotDecline);
+
+    expect(repositorioEspectador.delete).not.toHaveBeenCalled();
+    });
+
     });
 
