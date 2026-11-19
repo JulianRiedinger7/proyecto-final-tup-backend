@@ -85,4 +85,22 @@ export class EspectadorController {
       next(error);
     }
   };
+
+  darDeBaja = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const espectador = await this.service.darDeBaja(Number(req.params.id));
+      res.status(200).json({ msg: 'Espectador dado de baja', code: 200, data: espectador });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  reactivar = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const espectador = await this.service.reactivar(Number(req.params.id));
+      res.status(200).json({ msg: 'Espectador reactivado', code: 200, data: espectador });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -12,6 +12,17 @@ const espectadorDePrueba = {
   isActive: true,
 };
 
+const eventoDePrueba = {
+  titulo: 'Evento de integración',
+  descripcion: 'Evento creado para una prueba de integración',
+  fechaHora: '2030-10-10T20:00:00.000Z',
+  lugar: 'Sala de prueba',
+  aforoMaximo: 100,
+  cupoReservasWeb: 50,
+  precioPreventa: 4000,
+  precioPuerta: 5000,
+};
+
 describe('Rutas de espectadores', () => {
   let app: App;
 
@@ -125,6 +136,97 @@ describe('POST /api/v1/espectador', () => {
             
             expect(respuesta.status).toBe(409);
         });
+    
+    describe('PATCH /api/v1/espectadores/:id/baja', async () => {
+
+        it('Dar de baja a espectador activo exitosamente', async () => {
+            const respuestaCreacion = await request(app.instance).post('/api/v1/espectadores').send(espectadorDePrueba);
+            const espectadorCreado = respuestaCreacion.body.data as Espectadores;
+            
+            expect(respuestaCreacion.status).toBe(201);
+            
+            const respuestaActualizacion = await request(app.instance)
+                    .patch(`/api/v1/espectadores/${espectadorCreado.id}/baja`).send({ isActive: false});
+            
+            expect(respuestaActualizacion.status).toBe(200);
+            expect(respuestaActualizacion.body).toEqual({
+                msg: 'Espectador dado de baja',
+                code: 200,
+                data: {
+                    id: espectadorCreado.id,
+                    nombre: 'Espectador',
+                    apellido: 'De Prueba',
+                    email: 'integracion@example.com',
+                    dni: '99999999',
+                    telefono: '2914000000',
+                    isActive: false,
+                    createdAt: '2030-10-01T12:00:00.000Z',
+                    },
+                 });
+        });
+
+        it('No da de baja a aquellos espectadores con tickets reservados o activos', async ()=> {
+            const respuestaEspectador = await request(app.instance)
+                .post('/api/v1/espectadores')
+                .send(espectadorDePrueba);
+            expect(respuestaEspectador.status).toBe(201);
+            const espectador = respuestaEspectador.body.data as Espectadores;
+
+            const respuestaEvento = await request(app.instance)
+                .post('/api/v1/eventos')
+                .send(eventoDePrueba); 
+            expect(respuestaEvento.status).toBe(201);
+            const evento = respuestaEvento.body.data;
+
+            const respuestaTicket = await request(app.instance)
+                .post('/api/v1/tickets')
+                .send({ espectadorId: espectador.id, eventoId: evento.id });
+            expect(respuestaTicket.status).toBe(201);
+
+            const respuesta = await request(app.instance)
+                .patch(`/api/v1/espectadores/${espectador.id}/baja`);
+
+            expect(respuesta.status).toBe(409);
+
+            const resConsulta = await request(app.instance).get(`/api/v1/espectadores/${espectador.id}`);
+            expect(resConsulta.body.data.isActive).toBe(true);
+        });
+    
     });
+
+    describe('PATCH /api/v1/espectadores/:id/reactivar', async() => {
+        it('Dar de alta a espectador inactivo exitosamente', async () => { 
+        const respuestaCreacion = await request(app.instance)
+            .post('/api/v1/espectadores')
+            .send(espectadorDePrueba);
+        expect(respuestaCreacion.status).toBe(201);
+        const espectadorCreado = respuestaCreacion.body.data as Espectadores;
+
+        await request(app.instance)
+            .patch(`/api/v1/espectadores/${espectadorCreado.id}/baja`)
+            .expect(200);
+
+        const respuesta = await request(app.instance)
+            .patch(`/api/v1/espectadores/${espectadorCreado.id}/reactivar`);
+
+        expect(respuesta.status).toBe(200);
+        expect(respuesta.body).toEqual({
+            msg: 'Espectador reactivado',
+            code: 200,
+            data: {
+                id: espectadorCreado.id,
+                nombre: 'Espectador',
+                apellido: 'De Prueba',
+                email: 'integracion@example.com',
+                dni: '99999999',
+                telefono: '2914000000',
+                isActive: true,
+                createdAt: '2030-10-01T12:00:00.000Z',
+            },
+        });
+    });
+    });
+
 }); 
+});
 });

@@ -7,13 +7,13 @@ import {
 import type { Espectadores } from '../models/Espectadores';
 import type { IEspectadorRepository } from '../repositories/interfaces/IEspectadorRepository';
 import type { ITicketRepository } from '../repositories/interfaces/ITicketRepository';
-import { TicketRepository } from '../repositories/TicketRepository';
 import type { EspectadoresFilterParams } from '../schemas/espectador.schema';
 import type { IEspectadorService } from './interfaces/IEspectadorService';
 
 
 export class EspectadorService implements IEspectadorService {
   constructor(private repo: IEspectadorRepository, private ticketRepo: ITicketRepository) {}
+
 
  async create(datos: Espectadores) {
   const dniExistente = await this.repo.findByDNI(datos.dni);
@@ -128,15 +128,16 @@ export class EspectadorService implements IEspectadorService {
       throw new EspectadorDependencyNotFoundError('Espectador no encontrado');
     }
 
-    if (espectador.isActive) {
-      const tieneTicketsActivos = await new TicketRepository().existsByEspectadorAndEstados(
-        id.toString(),
-        ['RESERVADO', 'CONFIRMADO'],
-      );
-      if (tieneTicketsActivos) throw new EspectadorStatusCannotDecline();
-      return this.repo.changeIsActive(id);
-    } else {
+    if (!espectador.isActive) {
       return espectador;
     }
+
+    const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(
+      id.toString(), 
+      ['RESERVADO', 'CONFIRMADO'],
+    );
+    if (tieneTicketsActivos) throw new EspectadorStatusCannotDecline();
+
+    return this.repo.changeIsActive(id);
   }
 }
