@@ -20,9 +20,9 @@ Todas las rutas se exponen bajo el prefijo `/api/v1`.
 | `DELETE /api/v1/eventos/:id`     | Elimina un evento                                                                                  | `200`, `400`, `404`        |
 | `GET /api/v1/espectadores`       | Lista espectadores (`page`, `limit`, `sortBy`, `sortOrder`, `search`)                              | `200`, `400`               |
 | `GET /api/v1/espectadores/:id`   | Obtiene un espectador por ID                                                                       | `200`, `400`, `404`        |
-| `POST /api/v1/espectadores`      | Registra un espectador                                                                             | `201`, `400`               |
-| `PATCH /api/v1/espectadores/:id` | Actualiza parcialmente un espectador                                                               | `200`, `400`, `404`        |
-| `DELETE /api/v1/espectadores/:id`| Elimina un espectador                                                                              | `200`, `400`, `404`        |
+| `POST /api/v1/espectadores`      | Registra un espectador                                                                             | `201`, `400`, `409`        |
+| `PATCH /api/v1/espectadores/:id` | Actualiza parcialmente un espectador                                                               | `200`, `400`, `404`, `409` |
+| `DELETE /api/v1/espectadores/:id`| Elimina un espectador                                                                              | `200`, `400`, `404`, `409` |
 | `GET /api/v1/tickets`            | Lista tickets (`page`, `limit`, `sortBy`, `sortOrder`, `search`, `estado`, `eventoId`, `espectadorId`) | `200`, `400`           |
 | `GET /api/v1/tickets/:id`        | Obtiene un ticket por ID con `evento` y `espectador` resumidos                                     | `200`, `400`, `404`        |
 | `POST /api/v1/tickets`           | Emite un ticket en estado `RESERVADO`                                                              | `201`, `400`, `404`, `409` |
@@ -42,6 +42,8 @@ Todas las rutas se exponen bajo el prefijo `/api/v1`.
 ### Espectadores (`/api/v1/espectadores`)
 
 - **Payload de creación (`POST`):** `nombre`, `apellido`, `email`, `dni` (7 u 8 dígitos numéricos) y `telefono` (8 a 12 caracteres). Se registra con `isActive: true`.
+- **Unicidad:** `POST` y `PATCH` validan que el `dni` y el `email` no pertenezcan a otro espectador; si están duplicados responden `409`.
+- **Eliminación:** `DELETE` responde `409` si el espectador tiene tickets en estado `RESERVADO` o `CONFIRMADO`.
 - **Listado:** pagina por defecto de a `10` elementos (`limit` máximo `100`), ordena por `id`, `nombre`, `apellido`, `dni` o `email`, y filtra por `search` sobre `dni` o `email`.
 
 ### Tickets (`/api/v1/tickets`)

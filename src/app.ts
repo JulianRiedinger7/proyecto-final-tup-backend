@@ -13,6 +13,7 @@ import { TicketRepository } from './repositories/TicketRepository';
 import { EspectadorRoutes } from './routes/EspectadorRoutes';
 import { EventoRoutes } from './routes/EventoRoutes';
 import { TicketRoutes } from './routes/TicketRoutes';
+import { EspectadorService } from './services/EspectadorService';
 import { TicketService } from './services/TicketService';
 import { successResponse } from './utils/response';
 
@@ -42,6 +43,7 @@ export class App {
     const ticketRepo = new TicketRepository();
 
     const ticketService = new TicketService(ticketRepo, eventoRepo, espectadorRepo);
+    const espectadorService = new EspectadorService(espectadorRepo);
 
     this.instance.use(
       '/api/v1/eventos',
@@ -53,7 +55,7 @@ export class App {
     );
     this.instance.use(
       '/api/v1/espectadores',
-      new EspectadorRoutes(new EspectadorController(espectadorRepo)).getRoutes(),
+      new EspectadorRoutes(new EspectadorController(espectadorService)).getRoutes(),
     );
     this.instance.get('/api/v1/health', (_req, res) => successResponse(res, 'Status OK', 200, {}));
 

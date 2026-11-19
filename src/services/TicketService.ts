@@ -129,14 +129,14 @@ export class TicketService implements ITicketService {
     }
   }
 
-  async reservar(datos: { espectadorId: number; eventoId: number }) {
-  const espectador = await this.espectadores.findByID(datos.espectadorId);
+  async reservar(espectadorId: number, eventoId: number): Promise<Ticket | undefined> {
+  const espectador = await this.espectadores.findByID(espectadorId);
   if (!espectador) throw new EspectadorDependencyNotFoundError('Espectador no encontrado');
 
   if (!espectador.isActive) {
     throw new ExpectadorInactivoNoPuedeReservar(); 
   }
 
-  return this.createTicket(datos);
+  return this.createTicket({ espectadorId, eventoId });
 }
 }
