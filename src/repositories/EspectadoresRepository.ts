@@ -44,10 +44,10 @@ export class EspectadorRepository implements IEspectadorRepository {
   }
 
   async findByDNI(dni: string): Promise<Espectadores | undefined> {
-    return Promise.resolve(this.espectadores.find((espectador) => espectador.dni === dni)); 
+    return Promise.resolve(this.espectadores.find((espectador) => espectador.dni === dni));
   }
 
-  async findByEmail(email: string): Promise<Espectadores|undefined>{
+  async findByEmail(email: string): Promise<Espectadores | undefined> {
     return Promise.resolve(this.espectadores.find((espectador) => espectador.email === email));
   }
 
@@ -113,12 +113,11 @@ export class EspectadorRepository implements IEspectadorRepository {
     return espectador;
   }
 
- async changeIsActive(id: number): Promise<Espectadores | undefined> {
-  const espectador = await this.findByID(id);
-  if (espectador) {
-    espectador.isActive = !espectador.isActive;
+  async changeIsActive(id: number): Promise<Espectadores | undefined> {
+    const espectador = await this.findByID(id);
+    if (espectador) {
+      espectador.isActive = !espectador.isActive;
+    }
+    return espectador;
   }
-  return espectador;
-}
-
 }

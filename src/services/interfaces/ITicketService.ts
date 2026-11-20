@@ -7,5 +7,5 @@ export interface ITicketService {
   createTicket(ticket: NewTicket): Promise<Ticket>;
   updateTicket(id: number, ticket: PatchTicket): Promise<TicketListItem | undefined>;
   deleteTicket(id: number): Promise<Ticket | undefined>;
-  reservar(espectadorId:number, eventoId: number ): Promise <Ticket | undefined>;
+  reservar(espectadorId: number, eventoId: number): Promise<Ticket | undefined>;
 }

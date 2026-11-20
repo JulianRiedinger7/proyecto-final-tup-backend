@@ -26,8 +26,16 @@ export class EspectadorRoutes {
       validate(patchEspectadorSchema, 'body'),
       this.controller.update,
     );
-    this.router.patch('/:id/baja', validate(deleteEspectadorSchema, 'params'), this.controller.darDeBaja);
-    this.router.patch('/:id/reactivar', validate(deleteEspectadorSchema, 'params'), this.controller.reactivar);
+    this.router.patch(
+      '/:id/baja',
+      validate(deleteEspectadorSchema, 'params'),
+      this.controller.darDeBaja,
+    );
+    this.router.patch(
+      '/:id/reactivar',
+      validate(deleteEspectadorSchema, 'params'),
+      this.controller.reactivar,
+    );
     this.router.delete('/:id', validate(deleteEspectadorSchema, 'params'), this.controller.delete);
   }
 
