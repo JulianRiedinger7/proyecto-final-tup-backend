@@ -22,6 +22,8 @@ Todas las rutas se exponen bajo el prefijo `/api/v1`.
 | `GET /api/v1/espectadores/:id`   | Obtiene un espectador por ID                                                                       | `200`, `400`, `404`        |
 | `POST /api/v1/espectadores`      | Registra un espectador                                                                             | `201`, `400`, `409`        |
 | `PATCH /api/v1/espectadores/:id` | Actualiza parcialmente un espectador                                                               | `200`, `400`, `404`, `409` |
+| `PATCH /api/v1/espectadores/:id/reactivar` | Cambia de estado inactivo a activo a un espectador                                                               | `200`, `400`, `404`, `409` |
+| `PATCH /api/v1/espectadores/:id/baja` | Cambia el estado de activo a inactivo, asegurándose que no posea tickets en estado RESERVADO o ACTIVOS        | `200`, `400`, `404`, `409` |
 | `DELETE /api/v1/espectadores/:id`| Elimina un espectador                                                                              | `200`, `400`, `404`, `409` |
 | `GET /api/v1/tickets`            | Lista tickets (`page`, `limit`, `sortBy`, `sortOrder`, `search`, `estado`, `eventoId`, `espectadorId`) | `200`, `400`           |
 | `GET /api/v1/tickets/:id`        | Obtiene un ticket por ID con `evento` y `espectador` resumidos                                     | `200`, `400`, `404`        |
