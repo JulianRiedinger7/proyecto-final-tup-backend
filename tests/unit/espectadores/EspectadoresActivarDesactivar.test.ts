@@ -50,7 +50,7 @@ describe('Servicios de usuarios: editar usuario', () =>{
 
         expect(repositorioEspectador.findByID).toHaveBeenCalledWith(espectador.id);
         expect(repositorioTicket.existsByEspectadorAndEstados).toHaveBeenCalledWith(
-            espectador.id,
+            String(espectador.id),
             ['RESERVADO', 'CONFIRMADO'],
         );
         expect(repositorioEspectador.changeIsActive).toHaveBeenCalledWith(espectador.id);

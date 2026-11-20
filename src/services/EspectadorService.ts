@@ -99,7 +99,7 @@ export class EspectadorService implements IEspectadorService {
     }
 
     const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(
-      id.toString(),
+      espectador.id.toString(),
       ['RESERVADO', 'CONFIRMADO'],
     );
 
