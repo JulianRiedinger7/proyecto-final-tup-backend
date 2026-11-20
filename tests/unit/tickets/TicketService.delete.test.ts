@@ -33,6 +33,7 @@ describe('Servicio de tickets: eliminación', () => {
     const repositorioEventos: IEventoRepository = {
       findAll: vi.fn(),
       findById: vi.fn(),
+      existsByLugarAndFechaHora: vi.fn().mockResolvedValue(false),
       create: vi.fn(),
       replace: vi.fn(),
       update: vi.fn(),

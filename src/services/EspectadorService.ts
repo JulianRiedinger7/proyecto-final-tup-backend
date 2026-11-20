@@ -10,24 +10,25 @@ import type { ITicketRepository } from '../repositories/interfaces/ITicketReposi
 import type { EspectadoresFilterParams } from '../schemas/espectador.schema';
 import type { IEspectadorService } from './interfaces/IEspectadorService';
 
-
 export class EspectadorService implements IEspectadorService {
-  constructor(private repo: IEspectadorRepository, private ticketRepo: ITicketRepository) {}
+  constructor(
+    private repo: IEspectadorRepository,
+    private ticketRepo: ITicketRepository,
+  ) {}
 
+  async create(datos: Espectadores) {
+    const dniExistente = await this.repo.findByDNI(datos.dni);
+    if (dniExistente) {
+      throw new EspectadorIdRepeatedError('Ya existe un usuario con ese DNI');
+    }
 
- async create(datos: Espectadores) {
-  const dniExistente = await this.repo.findByDNI(datos.dni);
-  if (dniExistente) {
-    throw new EspectadorIdRepeatedError("Ya existe un usuario con ese DNI");
+    const emailExistente = await this.repo.findByEmail(datos.email);
+    if (emailExistente) {
+      throw new EspectadorEmailRepeatedError();
+    }
+
+    return this.repo.create(datos);
   }
-
-  const emailExistente = await this.repo.findByEmail(datos.email);
-  if (emailExistente) {
-    throw new EspectadorEmailRepeatedError();
-  }
-
-  return this.repo.create(datos);
-}
 
   async findAll(params: EspectadoresFilterParams = {}): Promise<{
     items: Espectadores[];
@@ -99,7 +100,7 @@ export class EspectadorService implements IEspectadorService {
     }
 
     const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(
-      id.toString(),
+      espectador.id.toString(),
       ['RESERVADO', 'CONFIRMADO'],
     );
 
@@ -132,10 +133,10 @@ export class EspectadorService implements IEspectadorService {
       return espectador;
     }
 
-    const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(
-      id.toString(), 
-      ['RESERVADO', 'CONFIRMADO'],
-    );
+    const tieneTicketsActivos = await this.ticketRepo.existsByEspectadorAndEstados(id.toString(), [
+      'RESERVADO',
+      'CONFIRMADO',
+    ]);
     if (tieneTicketsActivos) throw new EspectadorStatusCannotDecline();
 
     return this.repo.changeIsActive(id);

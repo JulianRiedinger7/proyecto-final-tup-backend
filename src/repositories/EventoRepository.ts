@@ -33,6 +33,22 @@ export class EventoRepository implements IEventoRepository {
     return this.eventos.find((evento) => evento.id === id);
   }
 
+  async existsByLugarAndFechaHora(
+    lugar: string,
+    fechaHora: string,
+    excludeId?: number,
+  ): Promise<boolean> {
+    const normalizedLugar = lugar.trim().toLocaleLowerCase();
+    const timestamp = Date.parse(fechaHora);
+
+    return this.eventos.some(
+      (evento) =>
+        evento.id !== excludeId &&
+        evento.lugar.trim().toLocaleLowerCase() === normalizedLugar &&
+        Date.parse(evento.fechaHora) === timestamp,
+    );
+  }
+
   async create(evento: NewEvento): Promise<Eventos> {
     this.ensureValidCapacity(evento);
     const nextId = this.eventos.reduce((maxId, current) => Math.max(maxId, current.id), 0) + 1;

@@ -105,7 +105,7 @@ Al analizar el backend de **CircuitoVivo** consideramos que el sistema funciona 
 
 #### Codigo analizado
 
-Los tres controllers ([TicketController](../src/controllers/TicketController.ts), [EspectadorController](../src/controllers/EspectadorController.ts), [EventoController](../src/config/EventoController.ts)). Y [errorHandler](../src/middlewares/errorHandler.ts) global.
+Los tres controllers ([TicketController](../src/controllers/TicketController.ts), [EspectadorController](../src/controllers/EspectadorController.ts), [EventoController](../src/controllers/EventoController.ts)). Y [errorHandler](../src/middlewares/errorHandler.ts) global.
 
 #### Evidencia (code smell)
 
@@ -140,3 +140,72 @@ El proyecto todavia no tiene tests, asi que no tenemos esa red de seguridad. Par
 - **Codigo:** [EspectadorController](../src/controllers/EspectadorController.ts), [TicketController](../src/controllers/TicketController.ts), [EventoController](../src/controllers/EventoController.ts), [errorHandler](../src/middlewares/errorHandler.ts) y [app.ts](../src/app.ts) (donde se registra).
 - **Beneficios:** un solo lugar decide como se responde un error, los controllers quedan mas cortos y con una sola responsabilidad (SRP).
 - **Costos:** Hay que acordarse de pasar `next` en los metodos nuevos, y las respuestas 500 ahora devuelven un mensaje generico (`Error interno del servidor`) en vez de uno por metodo (por ejemplo `Error al buscar los eventos`). Aceptamos ese cambio por simplicidad.
+
+---
+
+### Clase 8 — Documentación, automatización y evolución del diseño
+
+#### 1. Ensamblado de dependencias en `App` y capa `Services` (sin `ControllerFactory`)
+
+- **Código analizado:** [app.ts](../src/app.ts), [EventoService](../src/services/EventoService.ts), [EspectadorService](../src/services/EspectadorService.ts) y [TicketService](../src/services/TicketService.ts).
+- **Contexto:** En el análisis de la Clase 4 habíamos planteado una `ControllerFactory` para desacoplar las rutas. Al incorporar la capa de `Services` en las tres entidades, vimos que los servicios colaboran entre sí (por ejemplo, `EventoService` y `EspectadorService` consultan `ITicketRepository`, y `TicketService` consulta eventos y espectadores) y necesitan compartir exactamente las mismas instancias de los repositorios en memoria.
+- **Alternativas consideradas:**
+  - _Implementar `ControllerFactory.create(tipo)` instanciando repositorios en cada llamada:_ introduciría el riesgo de crear instancias duplicadas en memoria que no compartan estado entre módulos.
+  - _Composición centralizada en `App.setupRoutes()` (Composition Root):_ instanciar los tres repositorios una sola vez en [app.ts](../src/app.ts) e inyectarlos por constructor a cada `Service` y luego cada `Service` a su `Controller` y `Route`.
+- **Decisión y trade-offs:** Elegimos centralizar el ensamblado en [app.ts](../src/app.ts). Mantenemos **DIP** (controllers y servicios dependen de interfaces) y evitamos una clase fábrica extra sin necesidad real. Como costo, `App` conoce las clases concretas, algo aceptable por ser el punto de composición de la aplicación.
+
+#### 2. Mantener condicionales simples en reglas de Tickets (no implementar `Strategy`)
+
+- **Código analizado:** [TicketService](../src/services/TicketService.ts) y [date.ts](../src/utils/date.ts).
+- **Contexto:** Al implementar las reglas de negocio de Tickets incorporamos cálculo de precio (`precioPreventa` vs `precioPuerta` según la fecha en zona horaria Argentina).
+- **Alternativas consideradas:** Introducir patrones `Strategy` (para precios).
+- **Decisión y trade-offs:** Conservamos un condicional simple para el precio (dos variantes estables). Crear jerarquías de clases ahora sumaría indirección y archivos sin beneficio concreto; recién tendría sentido migrar si aparecieran promociones combinables.
+
+#### 3. Separar la documentación técnica y unificar verificaciones locales (`pnpm check`)
+
+- **Código analizado:** [README.md](../README.md), [api.md](./api.md) y [package.json](../package.json).
+- **Contexto:** Al sumar reglas de negocio en las tres entidades, concentrar todos los endpoints y comportamientos en `README.md` lo volvía difícil de recorrer. Además, validar lint, tipos y tests con comandos separados aumentaba el riesgo de omisiones antes de cada Pull Request.
+- **Alternativas consideradas:** Mantener un único `README.md` extenso y ejecutar comandos individuales vs separar la referencia de API y definir un comando compuesto.
+- **Decisión y trade-offs:** Dejamos [README.md](../README.md) enfocado en puesta en marcha, entorno y comandos, moviendo el detalle de endpoints y reglas por módulo a [docs/api.md](./api.md). En [package.json](../package.json) definimos `"check": "pnpm format:check && pnpm typecheck && pnpm test"` con criterio _fail-fast_ para estandarizar la validación local y en CI.
+
+---
+
+### Clase 9 — Estrategia de Testing
+
+#### 1. Pirámide de pruebas en el backend: unitarios aislados + integración HTTP real
+
+- **Código analizado:** [tests/unit/](../tests/unit/) y [tests/integration/](../tests/integration/).
+- **Contexto:** Las tres entidades poseen reglas de negocio con validaciones de fechas, unicidad, cupos y estados. Necesitábamos detectar regresiones rápido sin caer en falsa confianza por exceso de mocks.
+- **Alternativas consideradas:**
+  - _Solo tests unitarios con mocks:_ son rápidos, pero no validan el ruteo Express, la validación Zod (`validate`), los códigos HTTP ni el `errorHandler`.
+  - _Solo tests de integración HTTP:_ cubren el recorrido real, pero resultan más pesados para probar combinaciones de borde y aislar fallas.
+  - _Combinar ambos niveles según el riesgo:_ unitarios para lógica de dominio y bordes; integración HTTP para contratos y colaboración entre capas.
+- **Decisión y trade-offs:** Combinamos ambos niveles con Vitest y Supertest:
+  - **Unitarios (`tests/unit/`):** prueban `EventoService`, `EspectadorService`, `TicketService` y `EventoRepository` aislando dependencias externas con dobles (`vi.fn()`) y controlando el tiempo mediante `vi.useFakeTimers()` o inyección de reloj (`now` en `EventoService`) para cumplir **FIRST** (pruebas rápidas, independientes y repetibles).
+  - **Integración (`tests/integration/`):** levantan `new App()` con `Supertest` sobre los repositorios reales en memoria (sin mockear repositorios), verificando contratos JSON, validaciones de esquemas, códigos `400/404/409` y colaboración real entre módulos.
+
+#### 2. Por qué no implementamos tests E2E en el backend y sí en el frontend
+
+- **Contexto:** Para completar la pirámide de testing evaluamos si convenía agregar pruebas End-to-End con Playwright dentro de este repositorio backend o en el repositorio frontend (`proyecto-final-tup-frontend`).
+- **Alternativas consideradas:**
+  - _Agregar Playwright en el backend para realizar llamadas HTTP:_ exige sumar una dependencia pesada y mantener un segundo runner junto a Vitest.
+  - _Implementar el flujo crítico E2E en el frontend con Playwright contra el backend real:_ ejercita el sistema completo desde el navegador.
+- **Decisión y trade-offs:** **No agregar tests E2E en el backend y ubicar el flujo crítico E2E en el frontend.** En una API REST sin interfaz gráfica y con persistencia en memoria, la suite `tests/integration/` con `Supertest` ya recorre de punta a punta toda la pila del backend (`Router -> validate -> Controller -> Service -> Repositories -> errorHandler`); sumar E2E solo en el backend duplicaría esas verificaciones con mayor costo y lentitud. En cambio, ejecutar un flujo crítico E2E desde el frontend valida el sistema completo (`UI -> red/CORS -> API real -> renderizado`), atrapando problemas de integración entre ambos repositorios que ningún test aislado detectaría. Como trade-off, requiere levantar frontend y backend juntos y controlar los datos de prueba (por ejemplo, usar eventos con fecha futura).
+
+---
+
+### Clase 10 — Calidad del código e Integración Continua
+
+#### 1. Análisis estático unificado con Biome, TypeScript estricto y Husky
+
+- **Código analizado:** [biome.json](../biome.json), [tsconfig.json](../tsconfig.json) y [.husky/pre-commit](../.husky/pre-commit).
+- **Contexto:** Al trabajar tres integrantes en paralelo, las diferencias de formato, imports desordenados o variables sin uso generaban ruido en los diffs y fallas evitables.
+- **Alternativas consideradas:** Configurar ESLint y Prettier por separado vs adoptar Biome como linter, formatter y organizador de imports en una sola herramienta.
+- **Decisión y trade-offs:** Usamos **Biome 2.x** junto con TypeScript (`"strict": true`) y un hook `pre-commit` de **Husky** que corre `biome check --staged`. Reduce configuración y estandariza el estilo en todo el equipo. Como limitación conocida, el análisis estático no demuestra que una regla de negocio sea correcta, por lo que se complementa siempre con los tests automatizados.
+
+#### 2. Integración Continua con GitHub Actions reutilizando los mismos scripts locales
+
+- **Código analizado:** [.github/workflows/ci.yml](../.github/workflows/ci.yml), [package.json](../package.json) y [.nvmrc](../.nvmrc).
+- **Contexto:** Las verificaciones locales dependen de cada integrante y pueden omitirse (por ejemplo, durante el desarrollo se llegaron a integrar PRs con diferencias de formato y un ajuste de `tsconfig.json` incompatible con TypeScript `5.9.3`, lo cual fue detectado al ejecutar `pnpm check` y en CI).
+- **Alternativas consideradas:** Depender únicamente de verificaciones manuales locales vs ejecutar las mismas validaciones automáticamente en cada `push` y `pull_request`.
+- **Decisión y trade-offs:** Incorporamos [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) para las ramas `main` y `dev`. El workflow fija Node desde [`.nvmrc`](../.nvmrc), instala exacto con `pnpm install --frozen-lockfile` y ejecuta `pnpm check` (que utiliza `biome ci .` en modo solo lectura sin modificar archivos) seguido de `pnpm build`. Como trade-off, un check fallido en GitHub Actions solo _informa_ el problema en el PR; para bloquear merges automáticamente se requiere habilitar reglas de protección de rama (_branch protection_). No se implementa despliegue continuo (CD) por estar fuera del alcance del proyecto actual.

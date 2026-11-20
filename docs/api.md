@@ -9,25 +9,27 @@ Todas las rutas se exponen bajo el prefijo `/api/v1`.
 
 ## Resumen de endpoints
 
-| Endpoint                         | Descripción                                                                                        | Códigos habituales         |
-| -------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------- |
-| `GET /api/v1/health`             | Verifica que la API esté respondiendo                                                              | `200`                      |
-| `GET /api/v1/eventos`            | Lista eventos (`page`, `limit`, `sortOrder`, `titulo`, `lugar`)                                    | `200`, `400`               |
-| `GET /api/v1/eventos/:id`        | Obtiene un evento por ID                                                                           | `200`, `400`, `404`        |
-| `POST /api/v1/eventos`           | Crea un evento                                                                                     | `201`, `400`               |
-| `PUT /api/v1/eventos/:id`        | Reemplaza un evento existente                                                                      | `200`, `400`, `404`        |
-| `PATCH /api/v1/eventos/:id`      | Actualiza parcialmente un evento                                                                   | `200`, `400`, `404`        |
-| `DELETE /api/v1/eventos/:id`     | Elimina un evento                                                                                  | `200`, `400`, `404`        |
-| `GET /api/v1/espectadores`       | Lista espectadores (`page`, `limit`, `sortBy`, `sortOrder`, `search`)                              | `200`, `400`               |
-| `GET /api/v1/espectadores/:id`   | Obtiene un espectador por ID                                                                       | `200`, `400`, `404`        |
-| `POST /api/v1/espectadores`      | Registra un espectador                                                                             | `201`, `400`, `409`        |
-| `PATCH /api/v1/espectadores/:id` | Actualiza parcialmente un espectador                                                               | `200`, `400`, `404`, `409` |
-| `DELETE /api/v1/espectadores/:id`| Elimina un espectador                                                                              | `200`, `400`, `404`, `409` |
-| `GET /api/v1/tickets`            | Lista tickets (`page`, `limit`, `sortBy`, `sortOrder`, `search`, `estado`, `eventoId`, `espectadorId`) | `200`, `400`           |
-| `GET /api/v1/tickets/:id`        | Obtiene un ticket por ID con `evento` y `espectador` resumidos                                     | `200`, `400`, `404`        |
-| `POST /api/v1/tickets`           | Emite un ticket en estado `RESERVADO`                                                              | `201`, `400`, `404`, `409` |
-| `PATCH /api/v1/tickets/:id`      | Cambia `estado` y/o `fechaValidacionPuerta`                                                        | `200`, `400`, `404`, `409` |
-| `DELETE /api/v1/tickets/:id`     | Elimina un ticket                                                                                  | `200`, `400`, `404`        |
+| Endpoint                                   | Descripción                                                                                            | Códigos habituales         |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ | -------------------------- |
+| `GET /api/v1/health`                       | Verifica que la API esté respondiendo                                                                  | `200`                      |
+| `GET /api/v1/eventos`                      | Lista eventos (`page`, `limit`, `sortOrder`, `titulo`, `lugar`)                                        | `200`, `400`               |
+| `GET /api/v1/eventos/:id`                  | Obtiene un evento por ID                                                                               | `200`, `400`, `404`        |
+| `POST /api/v1/eventos`                     | Crea un evento                                                                                         | `201`, `400`, `409`        |
+| `PUT /api/v1/eventos/:id`                  | Reemplaza un evento existente                                                                          | `200`, `400`, `404`, `409` |
+| `PATCH /api/v1/eventos/:id`                | Actualiza parcialmente un evento                                                                       | `200`, `400`, `404`, `409` |
+| `DELETE /api/v1/eventos/:id`               | Elimina un evento                                                                                      | `200`, `400`, `404`, `409` |
+| `GET /api/v1/espectadores`                 | Lista espectadores (`page`, `limit`, `sortBy`, `sortOrder`, `search`)                                  | `200`, `400`               |
+| `GET /api/v1/espectadores/:id`             | Obtiene un espectador por ID                                                                           | `200`, `400`, `404`        |
+| `POST /api/v1/espectadores`                | Registra un espectador                                                                                 | `201`, `400`, `409`        |
+| `PATCH /api/v1/espectadores/:id`           | Actualiza parcialmente un espectador                                                                   | `200`, `400`, `404`, `409` |
+| `PATCH /api/v1/espectadores/:id/baja`      | Da de baja lógica a un espectador (`isActive: false`) si no tiene tickets `RESERVADO` o `CONFIRMADO`   | `200`, `400`, `404`, `409` |
+| `PATCH /api/v1/espectadores/:id/reactivar` | Reactiva un espectador inactivo (`isActive: true`)                                                     | `200`, `400`, `404`        |
+| `DELETE /api/v1/espectadores/:id`          | Elimina un espectador si no tiene tickets `RESERVADO` o `CONFIRMADO`                                   | `200`, `400`, `404`, `409` |
+| `GET /api/v1/tickets`                      | Lista tickets (`page`, `limit`, `sortBy`, `sortOrder`, `search`, `estado`, `eventoId`, `espectadorId`) | `200`, `400`               |
+| `GET /api/v1/tickets/:id`                  | Obtiene un ticket por ID con `evento` y `espectador` resumidos                                         | `200`, `400`, `404`        |
+| `POST /api/v1/tickets`                     | Emite un ticket en estado `RESERVADO`                                                                  | `201`, `400`, `404`, `409` |
+| `PATCH /api/v1/tickets/:id`                | Cambia `estado` y/o `fechaValidacionPuerta`                                                            | `200`, `400`, `404`, `409` |
+| `DELETE /api/v1/tickets/:id`               | Elimina un ticket                                                                                      | `200`, `400`, `404`        |
 
 ---
 
@@ -36,14 +38,24 @@ Todas las rutas se exponen bajo el prefijo `/api/v1`.
 ### Eventos (`/api/v1/eventos`)
 
 - **Payload de creación/reemplazo (`POST` / `PUT`):** `titulo`, `descripcion`, `fechaHora` (ISO datetime), `lugar`, `aforoMaximo` (entero `> 0`), `cupoReservasWeb` (entero `>= 0`), `precioPreventa` (`>= 0`) y `precioPuerta` (`>= 0`).
-- **Validación de capacidad:** `cupoReservasWeb` no puede superar `aforoMaximo` (si ocurre en creación, reemplazo o `PATCH`, responde `400`).
+- **Fecha futura (`POST`, `PUT` y `PATCH` al cambiar `fechaHora`):** `fechaHora` debe ser estrictamente posterior a la fecha y hora actual; caso contrario responde `400`.
+- **Validación de capacidad y precios (`POST`, `PUT`, `PATCH`):**
+  - `cupoReservasWeb` no puede superar `aforoMaximo` (`400`).
+  - `precioPuerta` no puede ser menor a `precioPreventa` (`400`).
+- **Lugar y horario únicos (`POST`, `PUT`, `PATCH`):** no puede existir otro evento con el mismo `lugar` (comparación normalizada sin distinción de mayúsculas ni espacios extremos) y la misma `fechaHora` (`409`).
+- **Restricciones al modificar (`PUT` / `PATCH`):**
+  - No se puede modificar un evento que ya comenzó (`ahora >= fechaHora`, responde `409`).
+  - No se puede reducir `cupoReservasWeb` por debajo de la cantidad de tickets no cancelados del evento (`409`).
+- **Eliminación (`DELETE`):** no se puede eliminar un evento que tenga tickets no cancelados (`409`).
 - **Listado:** pagina por defecto de a `10` elementos (`limit` máximo `100`), ordena por `fechaHora` (`asc` o `desc`) y filtra por `titulo` y `lugar`.
 
 ### Espectadores (`/api/v1/espectadores`)
 
 - **Payload de creación (`POST`):** `nombre`, `apellido`, `email`, `dni` (7 u 8 dígitos numéricos) y `telefono` (8 a 12 caracteres). Se registra con `isActive: true`.
-- **Unicidad:** `POST` y `PATCH` validan que el `dni` y el `email` no pertenezcan a otro espectador; si están duplicados responden `409`.
-- **Eliminación:** `DELETE` responde `409` si el espectador tiene tickets en estado `RESERVADO` o `CONFIRMADO`.
+- **Unicidad (`POST` y `PATCH`):** valida que el `dni` y el `email` no pertenezcan a otro espectador; si están duplicados responden `409`.
+- **Baja lógica (`PATCH /api/v1/espectadores/:id/baja`):** desactiva al espectador (`isActive: false`). Si posee tickets en estado `RESERVADO` o `CONFIRMADO`, responde `409`. Si ya estaba inactivo, lo devuelve sin cambios (`200`). Si no existe, responde `404`.
+- **Reactivación (`PATCH /api/v1/espectadores/:id/reactivar`):** reactiva un espectador inactivo (`isActive: true`). Si ya estaba activo, lo devuelve sin cambios (`200`). Si no existe, responde `404`.
+- **Eliminación (`DELETE`):** responde `409` si el espectador tiene tickets en estado `RESERVADO` o `CONFIRMADO`, y `404` si no existe.
 - **Listado:** pagina por defecto de a `10` elementos (`limit` máximo `100`), ordena por `id`, `nombre`, `apellido`, `dni` o `email`, y filtra por `search` sobre `dni` o `email`.
 
 ### Tickets (`/api/v1/tickets`)

@@ -59,6 +59,7 @@ describe('Servicio de tickets: creación', () => {
     repositorioEventos = {
       findAll: vi.fn(),
       findById: vi.fn().mockResolvedValue(evento),
+      existsByLugarAndFechaHora: vi.fn().mockResolvedValue(false),
       create: vi.fn(),
       replace: vi.fn(),
       update: vi.fn(),
