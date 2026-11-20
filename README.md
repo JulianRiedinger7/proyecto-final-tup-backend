@@ -77,7 +77,7 @@ Los repositorios cargan los datos iniciales desde archivos JSON en [`data/`](./d
 ```text
 ├── .github/workflows/     # Workflows de Integración Continua (GitHub Actions)
 ├── data/                  # Datos iniciales en JSON (eventos, espectadores, tickets)
-├── docs/                  # Documentación técnica y contrato de la API
+├── docs/                  # Documentación técnica (contrato de API y decisiones de diseño)
 ├── src/
 │   ├── config/            # Validación y carga de variables de entorno
 │   ├── controllers/       # Adaptadores HTTP (request/response y delegación)
@@ -87,7 +87,7 @@ Los repositorios cargan los datos iniciales desde archivos JSON en [`data/`](./d
 │   ├── repositories/      # Acceso a datos en memoria e interfaces (contratos)
 │   ├── routes/            # Definición de rutas y middlewares por recurso
 │   ├── schemas/           # Esquemas Zod para params, query y body
-│   ├── services/          # Lógica y reglas de negocio (actualmente TicketService)
+│   ├── services/          # Lógica y reglas de negocio (EventoService, EspectadorService, TicketService)
 │   ├── utils/             # Helpers de fechas (zona horaria AR) y respuestas HTTP
 │   ├── app.ts             # Configuración de Express, middlewares y montaje de rutas
 │   └── server.ts          # Punto de entrada que inicia el servidor HTTP
@@ -120,13 +120,14 @@ pnpm test:watch    # Corre Vitest en modo watch al modificar archivos
 
 - **Validación unificada (`pnpm check`):** encadena `format:check`, `typecheck` y `test` deteniéndose ante el primer fallo. Conviene ejecutarlo antes de abrir un Pull Request.
 - **Estilo de código y hook local:** configurado con **Biome 2.x** ([`biome.json`](./biome.json)). El hook `pre-commit` de **Husky** ejecuta `biome check --staged` y frena el commit si hay errores de lint o formato (extensión recomendada en VS Code: `biomejs.biome`, ver [`.vscode/extensions.json`](./.vscode/extensions.json)).
-- **Tests (`tests/unit/` y `tests/integration/`):** no requieren levantar el servidor manualmente ni una base de datos externa. Los unitarios prueban reglas de negocio de `TicketService` aislando los repositorios con dobles (`vi.fn()`); los de integración prueban los endpoints reales de `App` mediante `Supertest`.
+- **Tests (`tests/unit/` y `tests/integration/`):** no requieren levantar el servidor manualmente ni una base de datos externa. Los unitarios prueban las reglas de negocio de los servicios (`EventoService`, `EspectadorService` y `TicketService`) y repositorios aislando dependencias con dobles (`vi.fn()`); los de integración prueban los endpoints reales de `App` mediante `Supertest`.
 
-## Documentación de la API
+## Documentación técnica
 
 La API expone sus recursos bajo el prefijo `/api/v1` (`/api/v1/health`, `/api/v1/eventos`, `/api/v1/espectadores`, `/api/v1/tickets`) utilizando el formato estándar `{ "msg": string, "code": number, "data"?: T }`.
 
-El detalle completo de endpoints, parámetros, códigos de error y reglas de negocio por módulo se encuentra en [docs/api.md](./docs/api.md).
+- **Contrato de API y reglas de negocio:** [docs/api.md](./docs/api.md)
+- **Decisiones de diseño, testing y calidad:** [docs/decisiones-diseno.md](./docs/decisiones-diseno.md)
 
 ## Integración Continua (CI)
 
@@ -137,8 +138,7 @@ El workflow [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) se ejecuta 
 - [x] Modelo de datos inicial (ER) definido y documentado.
 - [x] CRUD de Tickets, Eventos y Espectadores implementado utilizando una arquitectura en capas.
 - [x] Persistencia inicial en memoria cargada desde archivos JSON (`data/`).
-- [x] Reglas de negocio y tests unitarios y de integración para Tickets.
+- [x] Reglas de negocio y tests unitarios y de integración para Tickets, Eventos y Espectadores.
 - [x] Validación local unificada (`pnpm check`) e Integración Continua con GitHub Actions.
-- [ ] Reglas de negocio y tests para Eventos y Espectadores.
 - [ ] Colección de Postman / especificación OpenAPI formal.
 - [ ] Migración a base de datos real.
